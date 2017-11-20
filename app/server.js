@@ -2,7 +2,7 @@
 
 // Dependencies
 const __ = require('./lib/lodashExt');
-const LogStub = require('./lib/logstub');
+const LogStub = require('logstub');
 const RelayLogger = require('./lib/relayLogger');
 const http = require('http');
 const https = require('https');
