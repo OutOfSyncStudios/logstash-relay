@@ -1,7 +1,6 @@
 // app/lib/logger.js
 
 // Dependencies
-const __ = require('./lodashExt');
 const winston = require('winston');
 const LogstashUDP = require('winston-logstash-udp').LogstashUDP;
 
