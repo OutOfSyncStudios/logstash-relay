@@ -163,7 +163,8 @@ class Server {
   }
 
   handleIncomingLog(req, res, next) {
-    this.relayLog(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
+    this.relayLog.log(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
+    req.hasData = true;
     next();
   }
 
@@ -189,7 +190,7 @@ class Server {
 
   responseHandler(req, res, next) {
     this.log.debug('Response Handler');
-    if (req.hasData === true && __.hasValue(req.data)) {
+    if (req.hasData === true) {
       this.setResponse(req, res);
     }
     next();
