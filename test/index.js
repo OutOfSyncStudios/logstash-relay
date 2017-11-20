@@ -1,28 +1,24 @@
 const test = require('unit.js');
 const config = require('../config/config');
 
-describe('uriel', () => {
-  const Uriel = require('../');
-  const statsd = new Uriel(config);
+describe('hermes', () => {
+  const Hermes = require('../');
+  const logRelay = new Hermes(config);
 
   it('load', () => {
     const MyModule = require('../');
     const myClass = new MyModule(config);
 
-    test.assert(myClass instanceof Uriel);
+    test.assert(myClass instanceof Hermes);
   });
 
   it('startup', () => {
-    statsd.init();
-    test.assert(statsd.isActive);
+    logRelay.init();
+    test.assert(logRelay.isActive);
   });
 
-  it('sleep', (done) => {
-    setTimeout(done, 6000);
-  }).timeout(10000);
-
   it('shutdown', () => {
-    statsd.close();
-    test.assert(!statsd.isActive);
+    logRelay.close();
+    test.assert(!logRelay.isActive);
   });
 });
