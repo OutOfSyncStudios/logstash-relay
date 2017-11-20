@@ -14,6 +14,8 @@ module.exports = {
     logDir: './logs',
     options: { json: false, maxsize: '10000000', maxFiles: '10', level: 'silly' }
   },
-  statsd: { host: '127.0.0.1', port: 8125, name: 'Test', attachHostName: false, telegraf: false },
-  logstash: { host: 'logstash.dealerslink.io', port: 5001, appName: 'websiteApi-local' },
+  logstash: {
+    logging: { host: 'logstashserver', port: 5001, appName: 'loggingRelay-local' },
+    relay: { host: 'logstashserver', port: 5051, appName: 'client-errors' }
+  }
 };
