@@ -16,7 +16,7 @@ module.exports = {
     logstashLogging: false
   },
   logstash: {
-    logging: { host: 'logstashserver', port: 5001, appName: 'loggingRelay-local' },
-    relay: { host: 'logstashserver', port: 5051, appName: 'client-errors' }
+    logging: { host: 'logstash.dealerslink.io', port: 5001, appName: 'loggingRelay-local' },
+    relay: { host: 'logstash.dealerslink.io', port: 5051, appName: 'client-errors' }
   }
 };
