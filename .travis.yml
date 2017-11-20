@@ -10,6 +10,6 @@ cache:
   - node_modules
 before_install:
 - openssl aes-256-cbc -K $encrypted_441992a5d097_key -iv $encrypted_441992a5d097_iv
-  -in config/ssl/star.dealerslink.io.key.enc -out config/ssl/star.dealerslink.io.key -d
+  -in ./config/ssl/star.dealerslink.io.key.enc -out ./config/ssl/star.dealerslink.io.key -d
 - openssl aes-256-cbc -K $encrypted_441992a5d097_key -iv $encrypted_441992a5d097_iv
-  -in config/ssl/localhost.key.enc -out config/ssl/localhost.key -d
+  -in ./config/ssl/localhost.key.enc -out ./config/ssl/localhost.key -d
