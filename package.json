@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chronosis/hermes.git"
+    "url": "git+https://github.com/MediaXPost/hermes.git"
   },
   "keywords": [
     "error",
@@ -25,9 +25,9 @@
   "author": "Jay Reardon",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chronosis/hermes/issues"
+    "url": "https://github.com/MediaXPost/hermes/issues"
   },
-  "homepage": "https://github.com/chronosis/hermes#readme",
+  "homepage": "https://github.com/MediaXPost/hermes#readme",
   "devDependencies": {
     "codacy-coverage": "^2.0.3",
     "gulp": "^3.9.1",
