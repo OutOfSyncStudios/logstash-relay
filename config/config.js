@@ -12,7 +12,8 @@ module.exports = {
   logging: {
     // Logging Configuration
     logDir: './logs',
-    options: { json: false, maxsize: '10000000', maxFiles: '10', level: 'silly' }
+    options: { json: false, maxsize: '10000000', maxFiles: '10', level: 'silly' },
+    logstashLogging: false
   },
   logstash: {
     logging: { host: 'logstashserver', port: 5001, appName: 'loggingRelay-local' },

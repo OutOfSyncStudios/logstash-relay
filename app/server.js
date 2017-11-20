@@ -2,6 +2,8 @@
 
 // Dependencies
 const __ = require('./lib/lodashExt');
+const LogStub = require('./lib/logstub');
+const RelayLogger = require('./lib/relayLogger');
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -45,7 +47,9 @@ class Server {
       this.sslCert = fs.readFileSync(config.server.sslCert); // Load SSL Cert
     }
 
-    this.log = log;
+    this.log = log || new LogStub();
+    this.relayLogger = {};
+    this.relayLog = {};
   }
 
   // ****************************************************************************
@@ -159,7 +163,7 @@ class Server {
   }
 
   handleIncomingLog(req, res, next) {
-    this.log(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
+    this.relayLog(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
     next();
   }
 
@@ -219,13 +223,7 @@ class Server {
       response: null,
       responseStart: null,
       route: null,
-      routeStart: null,
-      respCache: null,
-      respCacheStart: null,
-      mysql: null,
-      mysqlStart: null,
-      mysqlCache: null,
-      mysqlCacheStart: null
+      routeStart: null
     };
     next();
   }
@@ -237,11 +235,6 @@ class Server {
 
   startRouteTimer(req, res, next) {
     req.timers.routeStart = Date.now();
-    next();
-  }
-
-  startRespCacheTimer(req, res, next) {
-    req.timers.respCacheStart = Date.now();
     next();
   }
 
@@ -259,13 +252,6 @@ class Server {
     next();
   }
 
-  stopRespCacheTimer(req, res, next) {
-    if (req.timers.respCacheStart) {
-      req.timers.respCache = Date.now() - req.timers.respCacheStart;
-    }
-    next();
-  }
-
   stopResponseTimerError(req) {
     if (req.timers.responseStart) {
       req.timers.response = Date.now() - req.timers.responseStart;
@@ -278,18 +264,18 @@ class Server {
     }
   }
 
-  stopRespCacheTimerError(req) {
-    if (req.timers.respCacheStart) {
-      req.timers.respCache = Date.now() - req.timers.respCacheStart;
-    }
-  }
-
   // ****************************************************************************
   // Server Initialization Logic
   // ***************************************************************************/
   init() {
     this.setupServer(this.app);
+    this.setupRelay(this.config);
     this.isActive = true;
+  }
+
+  setupRelay(config) {
+    this.relayLogger = new RelayLogger(config);
+    this.relayLog = this.relayLogger.log;
   }
 
   setupServer(app) {

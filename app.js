@@ -55,8 +55,8 @@ class App {
         }
         this.log.debug('Settings:');
         this.log.debug(`Listening on Port: ${config.server.port}`);
-        this.log.debug(`Logstash Host: ${config.logstash.host}:${config.logstash.port}`);
-        this.log.debug(`Logstash App Name: ${config.logstash.appName}`);
+        this.log.debug(`Logstash Host: ${config.logstash.relay.host}:${config.logstash.relay.port}`);
+        this.log.debug(`Logstash App Name: ${config.logstash.relay.appName}`);
       } catch (err) {
         console.log(err.stack || err);
         process.exit(1);
