@@ -4,7 +4,7 @@ module.exports = {
     shutdownTime: 1000,
     namespace: '/',
     timeout: 5,
-    sslEnabled: true,
+    sslEnabled: false,
     sslPort: 8443,
     sslKey: `${__dirname}/ssl/localhost.key`,
     sslCert: `${__dirname}/ssl/localhost.pem`
@@ -16,7 +16,7 @@ module.exports = {
     logstashLogging: false
   },
   logstash: {
-    logging: { host: 'logstashserver', port: 5001, appName: 'loggingRelay-local' },
-    relay: { host: 'logstashserver', port: 5051, appName: 'client-errors' }
+    logging: { host: 'logstash-server', port: 5000, appName: 'logging-relay' },
+    relay: { host: 'logstash-relay-server', port: 5050, appName: 'client-errors' }
   }
 };
