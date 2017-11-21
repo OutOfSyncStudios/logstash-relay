@@ -1,9 +1,12 @@
+const request = require('supertest');
 const test = require('unit.js');
 const config = require('../config/config');
 
 describe('hermes', () => {
   const Hermes = require('../');
   const logRelay = new Hermes(config);
+
+  let svr;
 
   it('load', () => {
     const MyModule = require('../');
@@ -12,9 +15,36 @@ describe('hermes', () => {
     test.assert(myClass instanceof Hermes);
   });
 
-  it('startup', () => {
-    logRelay.init();
+  it('startup', async () => {
+    await logRelay.init();
+    svr = logRelay.server;
     test.assert(logRelay.isActive);
+  }).timeout(3000);
+
+  it('Bad Endpoint GET', (done) => {
+    request(svr).get('/test')
+      .expect(500, done);
+  });
+
+  it('Bad Endpoint POST', (done) => {
+    request(svr).post('/test')
+      .expect(500, done);
+  });
+
+  it('Good Endpoint GET', (done) => {
+    request(svr).get('/api/logger')
+      .expect(500, done);
+  });
+
+  it('Good Endpoint POST -- no data', (done) => {
+    request(svr).post('/api/logger')
+      .expect(500, done);
+  });
+
+  it('Good Endpoint POST -- good data', (done) => {
+    request(svr).post('/api/logger')
+      .send({ level: 'error', message: 'LAME' })
+      .expect(200, done);
   });
 
   it('shutdown', () => {
