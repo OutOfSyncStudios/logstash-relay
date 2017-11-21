@@ -41,9 +41,21 @@ describe('hermes', () => {
       .expect(500, done);
   });
 
-  it('Good Endpoint POST -- good data', (done) => {
+  it('Good Endpoint POST -- missing data', (done) => {
+    request(svr).post('/api/logger')
+    .send({ level: 'error' })
+      .expect(500, done);
+  });
+
+  it('Good Endpoint POST -- good Log4JS data', (done) => {
     request(svr).post('/api/logger')
       .send({ level: 'error', message: 'LAME' })
+      .expect(200, done);
+  });
+
+  it('Good Endpoint POST -- good JSNLogs data', (done) => {
+    request(svr).post('/api/logger')
+      .send({ r: 'ABCDEFG', lg: [ { n: 'test', l: 'error', t: Date.now(), m: 'LAME' } ] })
       .expect(200, done);
   });
 

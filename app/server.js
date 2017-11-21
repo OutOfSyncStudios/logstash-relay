@@ -163,17 +163,60 @@ class Server {
     next();
   }
 
+  safeDeserialize(data) {
+    try {
+      return JSON.parse(data);
+    } catch (err) {
+      return data;
+    }
+  }
+
   handleIncomingLog(req, res, next) {
-    const level = req.body.level.toLowerCase() || 'error';
-    const logMessage = {
-      type: 'client_error',
-      client_error: req.body.message,
-      actualIP: req.connection.remoteAddress,
-      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      callID: req.callID,
-      headers: req.headers
-    };
-    this.relayLog.log(level, JSON.stringify(logMessage));
+    if (__.hasValue(req.body.r) && __.hasValue(req.body.lg)) {
+      // Handle JSNLogs style logging
+      if (!req.body.lg || !Array.isArray(req.body.lg)) {
+        next('Malformed JSNLogs log message');
+        return;
+      }
+
+      const requestID = req.body.r;
+      const count = req.body.lg.length;
+      for (let itr = 0; itr < count; itr++) {
+        const entry = req.body.lg[itr];
+        const logName = entry.n;
+        const level = entry.l.toLowerCase() || 'error';
+        const timestamp = entry.t;
+        const logMessage = {
+          type: 'client_error',
+          name: logName,
+          requestID: requestID,
+          client_error: this.safeDeserialize(entry.m),
+          actualIP: req.connection.remoteAddress,
+          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+          callID: req.callID,
+          headers: req.headers,
+          clientTimestamp: timestamp
+        };
+        this.relayLog.log(level, JSON.stringify(logMessage));
+      }
+    } else if (__.hasValue(req.body.level) && __.hasValue(req.body.message)) {
+      // Handle Log4Javascript style logging
+      const level = req.body.level.toLowerCase() || 'error';
+      const timestamp = moment().valueOf();
+      const logMessage = {
+        type: 'client_error',
+        client_error: req.body.message,
+        actualIP: req.connection.remoteAddress,
+        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        callID: req.callID,
+        headers: req.headers,
+        clientTimestamp: timestamp
+      };
+      this.relayLog.log(level, JSON.stringify(logMessage));
+    } else {
+      next('Proper logging message was not found');
+      return;
+    }
     req.hasData = true;
     next();
   }
