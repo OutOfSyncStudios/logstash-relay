@@ -1,7 +1,7 @@
 {
   "name": "hermes",
   "version": "1.0.0",
-  "description": "A simple NodeJS error relay service for Log4Javascript and Logstash",
+  "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
