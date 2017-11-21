@@ -17,6 +17,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const timeout = require('connect-timeout');
 const expressWinston = require('express-winston');
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
 /**
  * @class Server
@@ -26,8 +27,8 @@ class Server {
   constructor(config, log) {
     this.app = express();
     // Setup Express
-    this.server = {};
-    this.httpsServer = {};
+    this.server = null;
+    this.httpsServer = null;
     this.config = config;
     this.hostname = os.hostname();
 
@@ -163,7 +164,16 @@ class Server {
   }
 
   handleIncomingLog(req, res, next) {
-    this.relayLog.log(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
+    const level = req.body.level.toLowerCase() || 'error';
+    const logMessage = {
+      type: 'client_error',
+      client_error: req.body.message,
+      actualIP: req.connection.remoteAddress,
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      callID: req.callID,
+      headers: req.headers
+    };
+    this.relayLog.log(level, JSON.stringify(logMessage));
     req.hasData = true;
     next();
   }
@@ -268,9 +278,9 @@ class Server {
   // ****************************************************************************
   // Server Initialization Logic
   // ***************************************************************************/
-  init() {
+  init(isLambda) {
+    this.setupRelay(this.config, isLambda);
     this.setupServer(this.app);
-    this.setupRelay(this.config);
     this.isActive = true;
   }
 
@@ -279,7 +289,7 @@ class Server {
     this.relayLog = this.relayLogger.log;
   }
 
-  setupServer(app) {
+  setupServer(app, isLambda) {
     this.log.debug('Starting server');
 
     app.use(this.setupTimers.bind(this));
@@ -317,6 +327,10 @@ class Server {
     // Setup the base server application namespace, if it has one
     // This is '/site' in local testing
     app.use(this.config.server.namespace, this.router);
+
+    if (isLambda === true) {
+      app.use(awsServerlessExpressMiddleware.eventContext());
+    }
 
     // Start Metrics Gathering on Route processing
     app.use(this.startRouteTimer.bind(this));
@@ -368,14 +382,16 @@ class Server {
     // the buck stops here -- all responses are sent, regardless of status
     app.use(this.sendResponse.bind(this));
 
-    // Start the HTTP server
-    this.server = http.createServer(app).listen(this.port);
-    this.log.debug(`Listening for HTTP on port ${this.port}`);
+    if (isLambda !== true) {
+      // Start the HTTP server
+      this.server = http.createServer(app).listen(this.port);
+      this.log.debug(`Listening for HTTP on port ${this.port}`);
 
-    // Start the HTTPS server
-    if (this.sslEnabled) {
-      this.httpsServer = https.createServer({ key: this.sslKey, cert: this.sslCert }, app).listen(this.sslPort);
-      this.log.debug(`Listening for HTTPS on port ${this.sslPort}`);
+      // Start the HTTPS server
+      if (this.sslEnabled) {
+        this.httpsServer = https.createServer({ key: this.sslKey, cert: this.sslCert }, app).listen(this.sslPort);
+        this.log.debug(`Listening for HTTPS on port ${this.sslPort}`);
+      }
     }
   }
 }
