@@ -80,8 +80,8 @@ class Server {
     }
     req.hasError = true;
     req.error = errorBlock;
-    req.respCode = 500000;
-    req.respStatus = 500;
+    req.respCode = req.respCode || 500000;
+    req.respStatus = req.respStatus || 500;
     this.setResponse(req, res);
   }
 
@@ -323,10 +323,6 @@ class Server {
     // The 'bind' statements are there to preserve the scope of this class
     app.use(this.attachCallID.bind(this));
     // app.use(this.controllers.AuthController.authenticateRequest.bind(this.controllers.AuthController));
-
-    // Setup the base server application namespace, if it has one
-    // This is '/site' in local testing
-    app.use(this.config.server.namespace, this.router);
 
     if (isLambda === true) {
       app.use(awsServerlessExpressMiddleware.eventContext());

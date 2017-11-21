@@ -2,7 +2,6 @@ module.exports = {
   server: {
     port: 8080,
     shutdownTime: 1000,
-    namespace: '/',
     timeout: 5,
     sslEnabled: false,
     sslPort: 8443,
