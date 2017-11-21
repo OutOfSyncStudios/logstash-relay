@@ -15,7 +15,7 @@ describe('hermes', () => {
     test.assert(myClass instanceof Hermes);
   });
 
-  it('startup', async () => {
+  it('startup', async() => {
     await logRelay.init();
     svr = logRelay.server;
     test.assert(logRelay.isActive);
@@ -43,7 +43,7 @@ describe('hermes', () => {
 
   it('Good Endpoint POST -- missing data', (done) => {
     request(svr).post('/api/logger')
-    .send({ level: 'error' })
+      .send({ level: 'error' })
       .expect(500, done);
   });
 
@@ -53,9 +53,10 @@ describe('hermes', () => {
       .expect(200, done);
   });
 
+  /* eslint id-length: off */
   it('Good Endpoint POST -- good JSNLogs data', (done) => {
     request(svr).post('/api/logger')
-      .send({ r: 'ABCDEFG', lg: [ { n: 'test', l: 'error', t: Date.now(), m: 'LAME' } ] })
+      .send({ r: 'ABCDEFG', lg: [{ n: 'test', l: 'error', t: Date.now(), m: 'LAME' }] })
       .expect(200, done);
   });
 
