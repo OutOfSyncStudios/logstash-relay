@@ -26,6 +26,24 @@ promptOpts = {
   properties: []
 };
 
+function performModify() {
+  modifyFiles(['./simple-proxy-api.yaml', './package.json', './cloudformation.yaml'],
+    [{
+      regexp: /YOUR_ACCOUNT_ID/g,
+      replacement: program.account
+    }, {
+      regexp: /YOUR_AWS_REGION/g,
+      replacement: program.region
+    }, {
+      regexp: /YOUR_UNIQUE_BUCKET_NAME/g,
+      replacement: program.bucket
+    }, {
+      regexp: /YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME/g,
+      replacement: program.lambda
+    }]
+  );
+}
+
 program
   .version(pack.version)
   .option('-a, --account <accountID>','The AWS Account ID to use.')
@@ -88,23 +106,10 @@ if (promptOpts.properties.length !== 0) {
       if (result.region) { program.region = result.region; }
       if (result.account) { program.account = result.account; }
       if (result.bucket) { program.bucket = result.bucket; }
+      performModify();
     }
     prompt.stop();
   });
+} else {
+  performModify();
 }
-
-modifyFiles(['./simple-proxy-api.yaml', './package.json', './cloudformation.yaml'],
-  [{
-    regexp: /YOUR_ACCOUNT_ID/g,
-    replacement: program.account
-  }, {
-    regexp: /YOUR_AWS_REGION/g,
-    replacement: program.region
-  }, {
-    regexp: /YOUR_UNIQUE_BUCKET_NAME/g,
-    replacement: program.bucket
-  }, {
-    regexp: /YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME/g,
-    replacement: program.lambda
-  }]
-);
