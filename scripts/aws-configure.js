@@ -34,8 +34,6 @@ const promptOpts = {
 };
 
 function performModify() {
-  console.log('aaaa');
-  console.log(JSON.stringify(options));
   modifyFiles(['./simple-proxy-api.yaml', './package.json', './cloudformation.yaml'],
     [{
       regexp: /YOUR_ACCOUNT_ID/g,
@@ -119,12 +117,10 @@ if (promptOpts.properties !== {}) {
   prompt.start();
   prompt.get(promptOpts, (err, result) => {
     if (result) {
-      console.log(JSON.stringify(result));
       if (result.lambda) { options.lambda = result.lambda; }
       if (result.region) { options.region = result.region; }
       if (result.account) { options.account = result.account; }
       if (result.bucket) { options.bucket = result.bucket; }
-      console.log(JSON.stringify(options));
       performModify();
     }
     prompt.stop();

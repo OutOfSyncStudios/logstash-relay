@@ -1,12 +1,12 @@
 {
-  "name": "hermes",
+  "name": "logrelay",
   "version": "1.0.0",
   "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
   "main": "index.js",
   "config": {
     "s3BucketName": "YOUR_UNIQUE_BUCKET_NAME",
     "region": "YOUR_AWS_REGION",
-    "cloudFormationStackName": "HermesStack",
+    "cloudFormationStackName": "LogRelayStack",
     "functionName": "YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME",
     "accountId": "YOUR_ACCOUNT_ID"
   },
@@ -20,6 +20,8 @@
     "pretty": "gulp pretty",
     "config": "node ./scripts/configure.js",
     "deconfig": "node ./scripts/deconfigure.js",
+    "aws-config": "node ./scripts/aws-configure.js",
+    "aws-deconfig": "node ./scripts/aws-deconfigure.js",
     "invoke-lambda": "aws lambda invoke --function-name $npm_package_config_functionName --region $npm_package_config_region --payload file://api-gateway-event.json lambda-invoke-response.json && cat lambda-invoke-response.json",
     "create-bucket": "aws s3 mb s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
     "delete-bucket": "aws s3 rb s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
@@ -37,7 +39,14 @@
     "error",
     "relay",
     "service",
-    "nodejs"
+    "nodejs",
+    "logstash",
+    "elasticsearch",
+    "logging",
+    "client",
+    "log4js",
+    "log4javascript",
+    "JSNLogs"
   ],
   "author": "Jay Reardon",
   "license": "MIT",
@@ -68,6 +77,7 @@
     "express-winston": "^2.4.0",
     "http": "0.0.0",
     "https": "^1.0.0",
+    "inquirer": "^4.0.1",
     "lodash": "^4.17.4",
     "logstub": "^1.0.0-2",
     "moment": "^2.19.2",
