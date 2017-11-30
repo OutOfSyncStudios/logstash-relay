@@ -18,7 +18,7 @@ program
 
 program.on('--help', () => {
   console.log('');
-  console.log(`  Hermes v${pack.version}`);
+  console.log(`  LogStash-Relay v${pack.version}`);
 });
 
 program.parse(process.argv);

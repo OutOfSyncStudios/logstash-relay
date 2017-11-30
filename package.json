@@ -1,6 +1,6 @@
 {
   "name": "logstash-relay",
-  "version": "1.0.0-1",
+  "version": "1.0.0-2",
   "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
   "main": "index.js",
   "config": {
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MediaXPost/hermes.git"
+    "url": "git+https://github.com/MediaXPost/logstash-relay.git"
   },
   "keywords": [
     "error",
@@ -51,9 +51,9 @@
   "author": "Jay Reardon",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MediaXPost/hermes/issues"
+    "url": "https://github.com/MediaXPost/logstash-relay/issues"
   },
-  "homepage": "https://github.com/MediaXPost/hermes#readme",
+  "homepage": "https://github.com/MediaXPost/logstash-relay#readme",
   "devDependencies": {
     "codacy-coverage": "^2.0.3",
     "gulp": "^3.9.1",

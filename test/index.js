@@ -2,9 +2,9 @@ const request = require('supertest');
 const test = require('unit.js');
 const config = require('../config/config');
 
-describe('hermes', () => {
-  const Hermes = require('../');
-  const logRelay = new Hermes(config);
+describe('logstash-relay', () => {
+  const LogStashRelay = require('../');
+  const logRelay = new LogStashRelay(config);
 
   let svr;
 
@@ -12,7 +12,7 @@ describe('hermes', () => {
     const MyModule = require('../');
     const myClass = new MyModule(config);
 
-    test.assert(myClass instanceof Hermes);
+    test.assert(myClass instanceof LogStashRelay);
   });
 
   it('startup', async() => {
