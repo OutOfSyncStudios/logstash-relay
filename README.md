@@ -3,12 +3,12 @@
 [![NPM](https://nodei.co/npm/logstash-relay.png?downloads=true)](https://nodei.co/npm/logstash-relay/)
 
 [![Actual version published on npm](http://img.shields.io/npm/v/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
-[![Travis build status](https://travis-ci.org/chronosis/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
+[![Travis build status](https://travis-ci.org/MediaXPost/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
 [![Total npm module downloads](http://img.shields.io/npm/dt/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
 [![Package Quality](http://npm.packagequality.com/shield/logstash-relay.svg)](http://packagequality.com/#?package=logstash-relay)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/chronosis/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MediaXPost/logstash-relay&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d264ea63a69a4e3899ce06d6e81f18fb)](https://www.codacy.com/app/chronosis/logstash-relay?utm_source=github.com&utm_medium=referral&utm_content=chronosis/logstash-relay&utm_campaign=Badge_Coverage)
-[![Dependencies badge](https://david-dm.org/chronosis/logstash-relay/status.svg)](https://david-dm.org/chronosis/logstash-relay?view=list)
+[![Dependencies badge](https://david-dm.org/MediaXPost/logstash-relay/status.svg)](https://david-dm.org/MediaXPost/logstash-relay?view=list)
 
 A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.
 
