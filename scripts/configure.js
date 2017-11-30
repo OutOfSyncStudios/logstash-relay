@@ -181,7 +181,25 @@ function setupQuestions() {
 }
 
 function mapAnswer(answers) {
-
+  if (answers.port) { conf.server.port = answers.port; }
+  conf.server.shutdownTime = answers.shutdownTime;
+  conf.server.timeout = answers.timeout;
+  if (answers.sslEnabled) { conf.server.sslEnabled = answers.sslEnabled; }
+  if (answers.sslPort) { conf.server.sslPort = answers.sslPort; }
+  if (answers.sslKey) { conf.server.sslKey = answers.sslKey; }
+  if (answers.sslCert) { conf.server.sslCert = answers.sslCert; }
+  if (answers.logDir) { conf.logging.logDir = answers.logDir; }
+  if (answers.logJson) { conf.logging.options.json = answers.logJson; }
+  if (answers.logMaxSize) { conf.logging.options.maxsize = answers.logMaxSize; }
+  if (answers.logMaxFiles) { conf.logging.options.maxFiles = answers.logMaxFiles; }
+  if (answers.logLevel) { conf.logging.options.level = answers.logLevel; }
+  if (answers.logstashLogging) { conf.logging.logstashLogging = answers.logstashLogging; }
+  if (answers.logstashLoggingHost) { conf.logstash.logging.host = answers.logstashLoggingHost; }
+  if (answers.logstashLoggingPort) { conf.logstash.logging.port = answers.logstashLoggingPort; }
+  if (answers.logstashLoggingAppName) { conf.logstash.logging.appName = answers.logstashLoggingAppName; }
+  conf.logstash.relay.host = answers.logstashRelayHost;
+  conf.logstash.relay.port = answers.logstashRelayPort;
+  conf.logstash.relay.appName = answers.logstashRelayAppName;
 }
 
 function doConfig() {
