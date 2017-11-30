@@ -44,17 +44,18 @@ class Logger {
     this.option = __.assign(this.options, config.logging.options);
     this.log = new winston.Logger(this.options);
 
-    // Add logstash logging when in production
-    // if (process.env.NODE_ENV === 'production') {
-    this.log.add(LogstashUDP, {
-      port: config.logstash.port,
-      host: config.logstash.host,
-      appName: config.logstash.appName,
-      json: true,
-      logstash: true,
-      level: 'info'
-    });
-    // }
+    // Add logstash logging when configured for it
+    if (config.logging.logstashLogging === true) {
+      this.log.add(LogstashUDP, {
+        port: config.logstash.logging.port,
+        host: config.logstash.logging.host,
+        appName: config.logstash.logging.appName,
+        json: true,
+        logstash: true,
+        level: 'info'
+      });
+    }
+    
     // Optimization -- Add console logging if not in production
     if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
       this.log

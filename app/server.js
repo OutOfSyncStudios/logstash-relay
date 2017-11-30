@@ -2,6 +2,8 @@
 
 // Dependencies
 const __ = require('./lib/lodashExt');
+const LogStub = require('logstub');
+const RelayLogger = require('./lib/relayLogger');
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -15,6 +17,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const timeout = require('connect-timeout');
 const expressWinston = require('express-winston');
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
 /**
  * @class Server
@@ -24,8 +27,8 @@ class Server {
   constructor(config, log) {
     this.app = express();
     // Setup Express
-    this.server = {};
-    this.httpsServer = {};
+    this.server = null;
+    this.httpsServer = null;
     this.config = config;
     this.hostname = os.hostname();
 
@@ -45,7 +48,9 @@ class Server {
       this.sslCert = fs.readFileSync(config.server.sslCert); // Load SSL Cert
     }
 
-    this.log = log;
+    this.log = log || new LogStub();
+    this.relayLogger = {};
+    this.relayLog = {};
   }
 
   // ****************************************************************************
@@ -75,8 +80,8 @@ class Server {
     }
     req.hasError = true;
     req.error = errorBlock;
-    req.respCode = 500000;
-    req.respStatus = 500;
+    req.respCode = req.respCode || 500000;
+    req.respStatus = req.respStatus || 500;
     this.setResponse(req, res);
   }
 
@@ -158,8 +163,61 @@ class Server {
     next();
   }
 
+  safeDeserialize(data) {
+    try {
+      return JSON.parse(data);
+    } catch (err) {
+      return data;
+    }
+  }
+
   handleIncomingLog(req, res, next) {
-    this.log(req.body.level.toLowerCase() || 'error', `Client: ${req.body.message}`);
+    if (__.hasValue(req.body.r) && __.hasValue(req.body.lg)) {
+      // Handle JSNLogs style logging
+      if (!req.body.lg || !Array.isArray(req.body.lg)) {
+        next('Malformed JSNLogs log message');
+        return;
+      }
+
+      const requestID = req.body.r;
+      const count = req.body.lg.length;
+      for (let itr = 0; itr < count; itr++) {
+        const entry = req.body.lg[itr];
+        const logName = entry.n;
+        const level = entry.l.toLowerCase() || 'error';
+        const timestamp = entry.t;
+        const logMessage = {
+          type: 'client_error',
+          name: logName,
+          requestID: requestID,
+          client_error: this.safeDeserialize(entry.m),
+          actualIP: req.connection.remoteAddress,
+          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+          callID: req.callID,
+          headers: req.headers,
+          clientTimestamp: timestamp
+        };
+        this.relayLog.log(level, JSON.stringify(logMessage));
+      }
+    } else if (__.hasValue(req.body.level) && __.hasValue(req.body.message)) {
+      // Handle Log4Javascript style logging
+      const level = req.body.level.toLowerCase() || 'error';
+      const timestamp = moment().valueOf();
+      const logMessage = {
+        type: 'client_error',
+        client_error: req.body.message,
+        actualIP: req.connection.remoteAddress,
+        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        callID: req.callID,
+        headers: req.headers,
+        clientTimestamp: timestamp
+      };
+      this.relayLog.log(level, JSON.stringify(logMessage));
+    } else {
+      next('Proper logging message was not found');
+      return;
+    }
+    req.hasData = true;
     next();
   }
 
@@ -185,7 +243,7 @@ class Server {
 
   responseHandler(req, res, next) {
     this.log.debug('Response Handler');
-    if (req.hasData === true && __.hasValue(req.data)) {
+    if (req.hasData === true) {
       this.setResponse(req, res);
     }
     next();
@@ -219,13 +277,7 @@ class Server {
       response: null,
       responseStart: null,
       route: null,
-      routeStart: null,
-      respCache: null,
-      respCacheStart: null,
-      mysql: null,
-      mysqlStart: null,
-      mysqlCache: null,
-      mysqlCacheStart: null
+      routeStart: null
     };
     next();
   }
@@ -237,11 +289,6 @@ class Server {
 
   startRouteTimer(req, res, next) {
     req.timers.routeStart = Date.now();
-    next();
-  }
-
-  startRespCacheTimer(req, res, next) {
-    req.timers.respCacheStart = Date.now();
     next();
   }
 
@@ -259,13 +306,6 @@ class Server {
     next();
   }
 
-  stopRespCacheTimer(req, res, next) {
-    if (req.timers.respCacheStart) {
-      req.timers.respCache = Date.now() - req.timers.respCacheStart;
-    }
-    next();
-  }
-
   stopResponseTimerError(req) {
     if (req.timers.responseStart) {
       req.timers.response = Date.now() - req.timers.responseStart;
@@ -278,21 +318,21 @@ class Server {
     }
   }
 
-  stopRespCacheTimerError(req) {
-    if (req.timers.respCacheStart) {
-      req.timers.respCache = Date.now() - req.timers.respCacheStart;
-    }
-  }
-
   // ****************************************************************************
   // Server Initialization Logic
   // ***************************************************************************/
-  init() {
+  init(isLambda) {
+    this.setupRelay(this.config, isLambda);
     this.setupServer(this.app);
     this.isActive = true;
   }
 
-  setupServer(app) {
+  setupRelay(config) {
+    this.relayLogger = new RelayLogger(config);
+    this.relayLog = this.relayLogger.log;
+  }
+
+  setupServer(app, isLambda) {
     this.log.debug('Starting server');
 
     app.use(this.setupTimers.bind(this));
@@ -327,15 +367,16 @@ class Server {
     app.use(this.attachCallID.bind(this));
     // app.use(this.controllers.AuthController.authenticateRequest.bind(this.controllers.AuthController));
 
-    // Setup the base server application namespace, if it has one
-    // This is '/site' in local testing
-    app.use(this.config.server.namespace, this.router);
+    if (isLambda === true) {
+      app.use(awsServerlessExpressMiddleware.eventContext());
+    }
 
     // Start Metrics Gathering on Route processing
     app.use(this.startRouteTimer.bind(this));
 
     // perform the logic for pushing the logging information
     app.use('/api/logger', this.handleIncomingLog.bind(this));
+    app.use('jsnlog.logger', this.handleIncomingLog.bind(this));
 
     // Stop Metrics Gathering on Route processing
     app.use(this.stopRouteTimer.bind(this));
@@ -381,14 +422,16 @@ class Server {
     // the buck stops here -- all responses are sent, regardless of status
     app.use(this.sendResponse.bind(this));
 
-    // Start the HTTP server
-    this.server = http.createServer(app).listen(this.port);
-    this.log.debug(`Listening for HTTP on port ${this.port}`);
+    if (isLambda !== true) {
+      // Start the HTTP server
+      this.server = http.createServer(app).listen(this.port);
+      this.log.debug(`Listening for HTTP on port ${this.port}`);
 
-    // Start the HTTPS server
-    if (this.sslEnabled) {
-      this.httpsServer = https.createServer({ key: this.sslKey, cert: this.sslCert }, app).listen(this.sslPort);
-      this.log.debug(`Listening for HTTPS on port ${this.sslPort}`);
+      // Start the HTTPS server
+      if (this.sslEnabled) {
+        this.httpsServer = https.createServer({ key: this.sslKey, cert: this.sslCert }, app).listen(this.sslPort);
+        this.log.debug(`Listening for HTTPS on port ${this.sslPort}`);
+      }
     }
   }
 }
