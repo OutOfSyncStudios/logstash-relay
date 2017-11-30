@@ -63,7 +63,6 @@
     "mocha": "^4.0.1",
     "nyc": "^11.3.0",
     "prettier": "^1.8.2",
-    "prompt": "^1.0.0",
     "superagent": "^3.8.1",
     "supertest": "^3.0.0",
     "unit.js": "^2.0.0"
