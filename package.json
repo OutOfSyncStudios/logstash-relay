@@ -1,5 +1,5 @@
 {
-  "name": "logrelay",
+  "name": "logstash-relay",
   "version": "1.0.0",
   "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "region": "YOUR_AWS_REGION",
     "functionName": "YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME",
     "accountId": "YOUR_ACCOUNT_ID",
-    "cloudFormationStackName": "LogRelayStack"
+    "cloudFormationStackName": "LogStashRelayStack"
   },
   "scripts": {
     "start": "node main.js",
