@@ -180,7 +180,7 @@ function setupQuestions() {
   });
 }
 
-function mapAnswer(answers) {
+function mapAnswers(answers) {
   if (answers.port) { conf.server.port = answers.port; }
   conf.server.shutdownTime = answers.shutdownTime;
   conf.server.timeout = answers.timeout;
@@ -206,7 +206,7 @@ function doConfig() {
   setupQuestions();
   inquirer.prompt(questions)
   .then((answers) => {
-    mapAnswer(answers);
+    mapAnswers(answers);
     fs.writeFileSync(configFile, `module.exports = ${JSON.stringify(conf, null, 2)};`);
   })
   .catch((err) => {

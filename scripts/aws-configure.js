@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-const modifyFiles = require('./utils');
+const __ = require('lodash');
 const program = require('commander');
-const prompt = require('prompt');
+const inquirer = require('inquirer');
+const modifyFiles = require('./utils');
 const pack = require('../package.json');
 
 const availableRegions = [
@@ -25,30 +26,141 @@ const availableRegions = [
 const options = {
   account: null,
   lambda: null,
-  region: null,
-  bucket: null
+  bucket: null,
+  region: null
 };
 
-const promptOpts = {
-  properties: {}
-};
+const questions = [];
 
 function performModify() {
-  modifyFiles(['./simple-proxy-api.yaml', './package.json', './cloudformation.yaml'],
+  modifyFiles(['./package.json'],
     [{
-      regexp: /YOUR_ACCOUNT_ID/g,
-      replacement: options.account
+      regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
+      replacement: `$1"${options.bucket}",`
     }, {
-      regexp: /YOUR_AWS_REGION/g,
-      replacement: options.region
+      regexp: /("region": )"([A-Za-z0-9_-]*)",/,
+      replacement: `$1"${options.region}",`
     }, {
-      regexp: /YOUR_UNIQUE_BUCKET_NAME/g,
-      replacement: options.bucket
+      regexp: /("functionName": )"([A-Za-z0-9_-]*)",/,
+      replacement: `$1"${options.lambda}",`
     }, {
-      regexp: /YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME/g,
-      replacement: options.lambda
+      regexp: /("accountId": )"(\w*)",/,
+      replacement: `$1"${options.account}",`
     }]
   );
+
+  modifyFiles(['./cloudformation.yaml'],
+    [{
+      regexp: /^(      Variables:\n        ServerlessExpressLambdaFunctionName: \!Ref )(\w*)$/m,
+      replacement: `$1${options.lambda}`
+    }, {
+      regexp: /^(      Action: lambda:InvokeFunction\n      FunctionName: !GetAtt )(.*)$/m,
+      replacement: `$1${options.lambda}.Arn`
+    }, {
+      regexp: /^(  \w*):\n(    Type: AWS::Serverless::Function)$/m,
+      replacement: `  ${options.lambda}:\n$2`
+    }, {
+      regexp: /^(        - "#\/functions\/")\n(        - !Ref )(\w*)$/m,
+      replacement: `$1\n$2${options.lambda}`
+    }]
+  );
+
+  modifyFiles(['./simple-proxy-api.yaml'],
+    [{
+      regexp: /(uri: arn:aws:apigateway:)([A-Za-z0-9_-]*)(:lambda:path\/2017-11-28\/functions\/arn:aws:lambda:)([A-Za-z0-9_-]*):([A-Za-z0-9_-]*)(:function:\${stageVariables.ServerlessExpressLambdaFunctionName}\/invocations)/g,
+      replacement: `$1${options.region}$3${options.region}:${options.account}$6`
+    } ]
+  );
+}
+
+function setupQuestions() {
+  if (!program.account || program.account.length !== 12) {
+    questions.push({
+      type: 'input',
+      name: 'account',
+      message: 'Suppley a 12-digit AWS Account ID:',
+      validate: (v) => {
+        if ((/^\w{12}$/).test(v)) {
+          return true;
+        } else {
+          return 'Must be a valid 12 digit AWS account';
+        }
+      }
+    });
+  } else {
+    options.account = program.account;
+  }
+
+  if (!program.lambda) {
+    questions.push({
+      type: 'input',
+      name: 'lambda',
+      message: 'Enter the AWS function name:',
+      default: 'LogStashRelayFunction',
+      validate: (v) => {
+        if ((/^[a-zA-Z_$][a-zA-Z_\-$0-9]*$/).test(v)) {
+          return true;
+        } else {
+          return 'Must be a valid function name. Only Alphanumercic, Underscore, and Dash are allowed and must not start with a number or dash.'
+        }
+      }
+    });
+  } else {
+    options.lambda = program.lambda;
+  }
+
+  if (!program.bucket) {
+    questions.push({
+      type: 'input',
+      name: 'bucket',
+      message: 'Enter a unique AWS S3 Bucket name:',
+      default: 'LogStashRelayBucket',
+      validate: (v) => {
+        if ((/^[a-zA-Z_\-$0-9]*$/).test(v)) {
+          return true;
+        } else {
+          return 'Must be a valid bucket name. Only Alphanumercic, Underscore, and Dash are allowed.'
+        }
+      }
+    });
+  } else {
+    options.bucket = program.bucket;
+  }
+
+  if (!program.region || !availableRegions.includes(program.region)) {
+    questions.push({
+      type: 'list',
+      name: 'region',
+      default: availableRegions,
+      choices: availableRegions,
+      message: 'Select an AWS Region:'
+    });
+  } else {
+    options.region = program.region;
+  }
+}
+
+function mapAnswers(answers) {
+  if (answers.account) { options.account = answers.account; }
+  if (answers.lambda) { options.lambda = answers.lambda; }
+  if (answers.bucket) { options.bucket = answers.bucket; }
+  if (answers.region) { options.region = answers.region; }
+}
+
+function doConfig() {
+  setupQuestions();
+  if (questions.length !== 0) {
+    inquirer.prompt(questions)
+    .then((answers) => {
+      mapAnswers(answers);
+      performModify();
+    })
+    .catch((err) => {
+      console.error(err.stack || err);
+    });
+  } else {
+    performModify();
+  }
 }
 
 program
@@ -58,73 +170,29 @@ program
   .option(
     '-l, --lambda <functionName>',
     'The name of the Lambda function to configure and use. Defaults to "AwsServerlessExpressFunction"')
-  .option('-r, --region <awsRegion>', 'The AWS region to use. Defaults to "us-east-1"');
+  .option('-r, --region <awsRegion>', 'The AWS region to use. Defaults to "us-east-1"')
+  .option('-f, --force', 'Do not ask for confirmation')
+  .parse(process.argv);
 
-if (!program.lambda) {
-  promptOpts.properties.lambda = {
-    name: 'lambda',
-    description: 'Enter the AWS Lambda function name',
-    default: 'AwsServerlessExpressFunction',
-    type: 'string',
-    required: true
-  };
+if (program.force === true) {
+  doConfig();
 } else {
-  options.lambda = program.lambda;
-}
-
-if (!program.region || !availableRegions.includes(program.region)) {
-  promptOpts.properties.region = {
-    name: 'region',
-    description: 'Enter an AWS region',
-    message: `Must be a valid AWS Region (${availableRegions.join(', ')})`,
-    default: 'us-east-1',
-    type: 'string',
-    required: true,
-    conform: (v) => {
-      return availableRegions.includes(v);
+  inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'ok',
+      default: false,
+      message: 'You are about to destroy the current aws configuration. This could lead to undesirable results, are you sure?'
     }
-  };
-} else {
-  options.region = program.region;
-}
-
-if (!program.account || program.account.length !== 12) {
-  promptOpts.properties.account = {
-    name: 'account',
-    description: 'Supply a 12 digit AWS account ID',
-    message: 'Must be a valid 12 digit AWS account',
-    type: 'string',
-    required: true,
-    pattern: /^\w{12}$/
-  };
-} else {
-  options.account = program.account;
-}
-
-if (!program.bucket) {
-  promptOpts.properties.bucket = {
-    name: 'bucket',
-    description: 'Supply a unique AWS S3 Bucket name',
-    message: 'AWS S3 Bucket name can not be blank',
-    type: 'string',
-    required: true
-  };
-} else {
-  options.bucket = program.bucket;
-}
-
-if (promptOpts.properties !== {}) {
-  prompt.start();
-  prompt.get(promptOpts, (err, result) => {
-    if (result) {
-      if (result.lambda) { options.lambda = result.lambda; }
-      if (result.region) { options.region = result.region; }
-      if (result.account) { options.account = result.account; }
-      if (result.bucket) { options.bucket = result.bucket; }
-      performModify();
+  ])
+  .then((answers) => {
+    if (answers.ok) {
+      doConfig();
+    } else {
+      console.log('Operation aborted');
     }
-    prompt.stop();
+  })
+  .catch((err) => {
+    console.error(err.stack || err);
   });
-} else {
-  performModify();
 }
