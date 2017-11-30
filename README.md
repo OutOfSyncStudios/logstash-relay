@@ -15,25 +15,28 @@ A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event 
 # Table of Contents
 
   1. [Documentation](#documentation)
-    1. [Modes of Operation](#relay-modes)
-      1. [Stand-alone Server](#standalone)
-        1. [Installation](#standalone-installation)
-        2. [Configuration](#standalone-configuration)
-          1. [Port Usage](#standalone-configuration-ports)
-          2. [SSL/TLS Certs](#standalone-configuration-certs)
-        3. [Running](#standalone-running)
-      2. [Embedded Service](#embedded)
-        1. [Installation](#embedded-installation)
-        2. [Usage](#embedded-usage)
-        3. [API](#embedded-api)
-      3. [AWS Lambda Function](#awslambda)
-        1. [Installation, Packaging, and Deployement](#awslambda-installation)
-        2. [Usage](#awslambda-usage)
-    2. [Configuration Object](#relay-configuration)
-    3. [Logging Object](#relay-logging)
-    4. [LogStash Configuration](#logstash-configuration)
-    5. [REST Endpoints](#restapi)
-      1. [Calling](#restapi-calling)
+      1. [Modes of Operation](#relay-modes)
+          1. [Stand-alone Server](#standalone)
+              1. [Installation](#standalone-installation)
+              2. [Configuration](#standalone-configuration)
+                  1. [Port Usage](#standalone-configuration-ports)
+                  2. [SSL/TLS Certs](#standalone-configuration-certs)
+              3. [Running](#standalone-running)
+          2. [Embedded Service](#embedded)
+              1. [Installation](#embedded-installation)
+              2. [Usage](#embedded-usage)
+              3. [API](#embedded-api)
+          3. [AWS Lambda Function](#awslambda)
+              1. [Installation, Packaging, and Deployement](#awslambda-installation)
+              2. [Usage](#awslambda-usage)
+      2. [Configuration Object](#relay-configuration)
+      3. [Logging Object](#relay-logging)
+      4. [LogStash](#logstash)
+          1. [Configuration](#logstash-configuration)
+          2. [Event Data](#logstash-eventdata)
+      5. [REST API](#restapi)
+          1. [Endpoints](#restapi-endpoints)
+          2. [Calling](#restapi-calling)
   2. [License](#license)
 
 # Goals
@@ -46,9 +49,9 @@ A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event 
 <a name="relay-modes"></a>
 
 The logstash-relay service has three possible modes of operation:
- * As a Stand-alone server;
- * As an embedded service; or,
- * As an AWS Lambda Function
+ * [Stand-alone Server](#standalone)
+ * [Embedded Service](#embedded)
+ * [AWS Lambda Function](#awslambda)
 
 ### [Stand-alone Server](#standalone)
 <a name="standalone"></a>
@@ -265,13 +268,36 @@ The Lambda function can be called by making the appropriate [REST Endpoint](#res
 <a name="relay-logging"></a>
 The Logging object is an instance of any logging library, such as [Winston](https://www.npmjs.com/package/winston) or [Bunyan](https://www.npmjs.com/package/bunyan), which support the `.error(...)`, `.info(...)`, `.debug(...)`, and `.log(...)` methods. When in stand-alone mode, the server will use the configuration values to create an instance of Winston.
 
-## [LogStash Configuration](#logstash-configuration)
+## [LogStash](#logstash)
+<a name="logstash"></a>
+
+### [Configuration](#logstash-configuration)
 <a name="logstash-configuration"></a>
 Two files are included in this package `./config/logstash-relay.conf` and `./config/logstash-logging.conf`. These two files are base configurations for LogStash and should be moved to your LogStash server to handle incoming events from the LogStash-Relay service. `logstash-logging.conf` is only used for the stand-alone mode and handles events created by LogStash-Relay itself when the `logging.logstashLogging` option is set to `true`. `logstash-relay.conf` handles all events that are passed to the relay and is necessary for proper functioning. Both files should be edited so that ElasticSearch server host address if properly reflected in the configuration.
 
-## [REST Endpoints](#restapi)
+### [Event Data](#logstash-eventdata)
+<a name="logstash-eventdata"></a>
+Event data is passed to LogStash as a JSON object formatted like below:
+```js
+{
+  type: 'client_error',
+  name: 'The name of the log',
+  requestID: 'af4b33d2ae870d',
+  client_error: 'error message or JSON object',
+  actualIP: 'client_IP_address',
+  ip: 'forwarded_client_IP_address_from_proxy',
+  callID: 'UID for the relay request',
+  headers: 'An object containing all http headers sent to the server',
+  clientTimestamp: timestamp
+}
+```
+
+## [REST API](#restapi)
 <a name="restapi"></a>
 Once the server is setup and running, then the REST API microservice will be available. The service provides two identical POST endpoints.
+
+### [Endpoints](#restapi-endpoints)
+<a name="restapi-endpoints"></a>
 
 ### OPTIONS *
 This exists for CORS requests.
