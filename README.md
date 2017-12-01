@@ -285,10 +285,9 @@ This package contains two files -- `./config/logstash-relay.conf` and `./config/
 
 To setup Logstash with these files:
 
-    1. Copy the appropriate files to the Logstash server instance configuration folder. This is usually `/etc/logstash/conf.d` for most configurations.
-    2. Edit the file(s) and update the ElasticSearch server host address as appropriate for the environment.
-    3. Restart Logstash -- usually this is done with the command `$ initctl restart logstash`.
-
+  1. Copy the appropriate files to the Logstash server instance configuration folder. This is usually `/etc/logstash/conf.d` for most configurations.
+  2. Edit the file(s) and update the ElasticSearch server host address as appropriate for the environment.
+  3. Restart Logstash -- usually this is done with the command `$ initctl restart logstash`.
 
 ### [Event Data](#logstash-eventdata)
 <a name="logstash-eventdata"></a>
