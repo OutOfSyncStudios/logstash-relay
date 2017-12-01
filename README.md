@@ -215,7 +215,7 @@ These steps support Linux and Mac only. When using Windows environment locally, 
 
   This last step will create an S3 Bucket and a CloudFormation Stack. The CloudFormation Stack will in turn setup an AWS Lambda function and connect it to CloudFront and API GateWay. Additionally, routing through API Gateway and Route53 are possible to create a "pretty" URL that can connect to your API Gateway endpoint for the Lambda function. Please consult the [AWS API Gateway documentation](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for additional details.
 
-##### [Usage](#awslambda-usage)
+#### [Usage](#awslambda-usage)
 <a name="awslambda-usage"></a>
 
 The Lambda function can be called by making the appropriate [REST Endpoint](#restapi) request to the API Gateway `prod` endpoint. The correct `prod` Invoke URL can be retrieved throug the [API Gateway Dashboard](https://console.aws.amazon.com/apigateway/home) under APIs > (Your LogStashRelayAPI Name) > Stages.
