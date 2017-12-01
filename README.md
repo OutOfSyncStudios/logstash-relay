@@ -371,4 +371,5 @@ Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourse
 <a name="license"></a>
 
 Copyright (c) 2017 Jay Reardon -- Licensed under the MIT license.
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMediaXPost%2Flogstash-relay.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMediaXPost%2Flogstash-relay?ref=badge_large)
