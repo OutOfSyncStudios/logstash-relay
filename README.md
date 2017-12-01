@@ -56,7 +56,7 @@ The logstash-relay service has three possible modes of operation:
 ### [Stand-alone Service](#standalone)
 <a name="standalone"></a>
 
-The stand-alone option is available if you would like to host your own server architecture with which to run the relay.
+The stand-alone service option is available when it is desirable to use new/existing server architecture and more control over the environment is required.
 
 #### [Installation](#standalone-installation)
 <a name="standalone-installation"></a>
@@ -70,11 +70,11 @@ $ cd logstash-relay
 
 #### [Configuration](#standalone-configuration)
 <a name="standalone-configuration"></a>
-To setup your configuration, run:
+To configure, run:
 ```shell
 npm run config
 ```
-This will ask a series of questions which provides the base configuration. Alternatively, you can manually edit the `<logstash-relay-home>/config/config.js` file to make adjustments. The configuration file is an exported version of the [Configuration Object](#relay-configuration).
+This will ask a series of questions which provides the base configuration. Alternatively, it is possible to manually edit the `<logstash-relay-home>/config/config.js` file to make adjustments. The configuration file is an exported version of the [Configuration Object](#relay-configuration).
 
 ##### [Port Usage](#standalone-configuration-ports)
 <a name="standalone-configuration-ports"></a>
@@ -136,7 +136,7 @@ $ pm2 start main.js -n "Logstash-Relay" -i 1 -- -c <fullpath to config file>
 ### [Embedded Service](#embedded)
 <a name="embedded"></a>
 
-The embedded option is available if you would like to include the service bundled as a part of another service.
+The embedded option is available if  would like to include the service bundled as a part of another service.
 
 #### [Installation](#embedded-installation)
 <a name="embedded-installation"></a>
@@ -147,7 +147,7 @@ npm install logstash-relay
 
 #### [Usage](#embedded-usage)
 <a name="embedded-usage"></a>
-Within your library or application, add the following code:
+Within a library or application, add the following code:
 
 ```js
 const LogstashRelay = require('logstash-relay');
@@ -189,14 +189,14 @@ relay.close();
 
 ### [AWS Lambda Function](#awslambda)
 <a name="awslambda"></a>
-The service is also available to be run in a completely serverless environment by utilizing it as an AWS Lambda Function connected through CloudFormation and API Gateway.  To use this mode, you must have access to an AWS Account ID that has permissions to create and use CloudFormation, S3, API Gateway, CloudFront, and Lambda resources.
+The service is also available to be run in a completely serverless environment by utilizing it as an AWS Lambda Function connected through CloudFormation and API Gateway.  To use this mode, the AWS credentials must have permissions to create and use CloudFormation, S3, API Gateway, CloudFront, and Lambda resources.
 
 #### [Installation, Packaging, and Deployment](#awslambda-installation)
 <a name="awslambda-installation"></a>
 
-These steps support Linux and Mac only. When using Windows environment locally, it is recommended that a staging AWS EC2 instance with NVM(NodeJS) and Python is setup and used.
+These steps support MacOS and Linux. When using Windows environment locally, it is recommended that a staging AWS EC2 Linux instance with NVM(NodeJS) and Python is setup and used.
 
-  1. If it is not already, install the [AWS CLI](https://aws.amazon.com/cli/) to your staging environment (mac/linx only).
+  1. If it is not already, install the [AWS CLI](https://aws.amazon.com/cli/) on the staging environment (MacOS/Linux only).
   2. Clone the git repo:
   ```shell
   $ git clone https://github.com/MediaXPost/logstash-relay.git
@@ -215,7 +215,7 @@ These steps support Linux and Mac only. When using Windows environment locally, 
   $ npm run setup
   ```
 
-  This last step will create an S3 Bucket and a CloudFormation Stack. The CloudFormation Stack will in turn setup an AWS Lambda function and connect it to CloudFront and API GateWay. Additionally, routing through API Gateway and Route53 are possible to create a "pretty" URL that can connect to your API Gateway endpoint for the Lambda function. Please consult the [AWS API Gateway documentation](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for additional details.
+  This last step will create an S3 Bucket and a CloudFormation Stack. The CloudFormation Stack will in turn setup an AWS Lambda function and connect it to CloudFront and API GateWay. Additionally, routing through API Gateway and Route53 are possible to create a "pretty" URL that can connect to the API Gateway endpoint for the Lambda function. Please consult the [AWS API Gateway documentation](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for additional details.
 
 #### [Usage](#awslambda-usage)
 <a name="awslambda-usage"></a>
@@ -362,9 +362,7 @@ JSNLogs events are structured as follows:
 ### [Calling](#restapi-calling)
 <a name="restapi-calling"></a>
 
-Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourserviceURL>/api/logger` or `http(s)://<yourserviceURL>/jsnlog.logger`.  Alternatively, call these endpoints directly in your client or server application using one of the log formats outlined above.
-
-
+Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourserviceURL>/api/logger` or `http(s)://<yourserviceURL>/jsnlog.logger`.  Alternatively, call these endpoints directly within an application using one of the log formats outlined above.
 
 # License
 <a name="license"></a>
