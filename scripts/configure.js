@@ -13,7 +13,7 @@ const config = require('../config/config');
 let conf = __.merge(baseConfig, config);
 
 const modes = [
-  'Stand-alone Server',
+  'Stand-alone Service',
   'Embedded service',
   'AWS Lambda Function'
 ];
@@ -30,7 +30,7 @@ function setupQuestions() {
     name: 'mode',
     default: modes,
     choices: modes,
-    message: 'Select the server mode:',
+    message: 'Select the service mode:',
   }, {
     type: 'input',
     name: 'port',
@@ -38,7 +38,7 @@ function setupQuestions() {
     message: 'Server port to listen for HTTP requests:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode !== 'AWS Lambda Function');
+      return (answers.mode !== modes[2]);
     }
   }, {
     type: 'input',
@@ -58,7 +58,7 @@ function setupQuestions() {
     default: conf.server.sslEnabled,
     message: 'Enable SSL?',
     when: (answers) => {
-      return (answers.mode !== 'AWS Lambda Function');
+      return (answers.mode !== modes[2]);
     }
   }, {
     type: 'input',
@@ -67,7 +67,7 @@ function setupQuestions() {
     message: 'Server port to listen for HTTP requests:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode !== 'AWS Lambda Function' && answers.sslEnabled);
+      return (answers.mode !== modes[2] && answers.sslEnabled);
     }
   }, {
     type: 'input',
@@ -75,7 +75,7 @@ function setupQuestions() {
     default: conf.server.sslKey,
     message: 'Full path to SSL Cert (.key) file:',
     when: (answers) => {
-      return (answers.mode !== 'AWS Lambda Function' && answers.sslEnabled);
+      return (answers.mode !== modes[2] && answers.sslEnabled);
     }
   }, {
     type: 'input',
@@ -83,7 +83,7 @@ function setupQuestions() {
     default: conf.server.sslCert,
     message: 'Full path to SSL Cert (.pem/.crt) file:',
     when: (answers) => {
-      return (answers.mode !== 'AWS Lambda Function' && answers.sslEnabled);
+      return (answers.mode !== modes[2] && answers.sslEnabled);
     }
   }, {
     type: 'input',
@@ -91,7 +91,7 @@ function setupQuestions() {
     default: conf.logging.logDir,
     message: 'Full or relative path (from service base) to the log folder:',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'confirm',
@@ -99,7 +99,7 @@ function setupQuestions() {
     default: conf.logging.options.json,
     message: 'JSON logging?',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'input',
@@ -108,7 +108,7 @@ function setupQuestions() {
     message: 'Max log file size in bytes:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'input',
@@ -117,7 +117,7 @@ function setupQuestions() {
     message: 'Max number of rotated log files:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'list',
@@ -126,7 +126,7 @@ function setupQuestions() {
     default: conf.logging.options.level,
     message: 'Select lowest logging level:',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'confirm',
@@ -134,7 +134,7 @@ function setupQuestions() {
     default: conf.logging.logstashLogging,
     message: 'Enable LogStash logging for service events?',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server');
+      return (answers.mode === modes[0]);
     }
   }, {
     type: 'input',
@@ -142,7 +142,7 @@ function setupQuestions() {
     default: conf.logstash.logging.host,
     message: 'Enter the LogStash IP or Hostname for service events:',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server' && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging)
     }
   }, {
     type: 'input',
@@ -151,7 +151,7 @@ function setupQuestions() {
     message: 'Enter the LogStash UDP port for service events:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server' && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging)
     }
   }, {
     type: 'input',
@@ -159,7 +159,7 @@ function setupQuestions() {
     default: conf.logstash.logging.appName,
     message: 'Enter the unqiue App Name to use for LogStash service events:',
     when: (answers) => {
-      return (answers.mode === 'Stand-alone Server' && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging)
     }
   }, {
     type: 'input',

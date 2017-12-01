@@ -136,7 +136,7 @@ $ pm2 start main.js -n "Logstash-Relay" -i 1 -- -c <fullpath to config file>
 ### [Embedded Service](#embedded)
 <a name="embedded"></a>
 
-The embedded option is available if  would like to include the service bundled as a part of another service.
+The embedded option is available if including the service bundled as a part of another service is desired.
 
 #### [Installation](#embedded-installation)
 <a name="embedded-installation"></a>
@@ -154,8 +154,10 @@ const LogstashRelay = require('logstash-relay');
 
 // Create the relay service
 let relay = new LogstashRelay(config, logger);
+
 // Start the relay service
 relay.init();
+
 // Close the relay service
 relay.close();
 ```
@@ -166,14 +168,14 @@ relay.close();
 <a name="embedded-api"></a>
 
 ##### constructor(config[, logger])
-Creates a new LogstashRelay agent.
+Creates a new Logstash-Relay agent.
 ```js
 const LogstashRelay = require('logstash-relay');
 
 let relay =  new LogstashRelay(config, logger);
 ```
 
-Where the [`config`](#embedded-configuration) and [`logger`](#embedded-logger) parameters are as outlined below. The `logger` is optional, and if no logger is provided then all logging is sent to `/dev/null`.
+Where the [`config`](#relay-configuration) and [`logger`](#relay-logger) parameters are as outlined below. The `logger` is optional, and if no logger is provided then all logging is sent to `/dev/null`.
 
 ##### .init()
 Initializes and starts the Logstash-Relay agent.
@@ -267,7 +269,7 @@ The Lambda function can be called by making the appropriate [REST Endpoint](#res
 |**`logstash.logging`**|Object|Logstash information for Logstash-Relay log events when `logging.logstashLogging === true`|
 |**`logstash.relay`**|Object|Logstash information for relayed log events|
 |**`logstash.*.host`**|String|IP/Domain of the logstash server for this configuration|
-|**`logstash.*.port`**|Integer|UDP Port that handled the event|
+|**`logstash.*.port`**|Integer|UDP Port that handled the events|
 |**`logstash.*.appName`**|String|Unique identifying name that Logstash uses to classify events sent to ElasticSearch|
 
 ### [Logging Object](#relay-logging)
@@ -364,7 +366,7 @@ JSNLogs events are structured as follows:
 
 Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourserviceURL>/api/logger` or `http(s)://<yourserviceURL>/jsnlog.logger`.  Alternatively, call these endpoints directly within an application using one of the log formats outlined above.
 
-# License
+# [License](#license)
 <a name="license"></a>
 
 Copyright (c) 2017 Jay Reardon -- Licensed under the MIT license.
