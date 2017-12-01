@@ -17,7 +17,7 @@ inquirer.prompt([
     type: 'confirm',
     name: 'ok',
     default: false,
-    message: 'You are about to destroy the current aws configuration. This could lead to undesirable results, are you sure?'
+    message: 'You are about to destroy the current aws configuration. Are you sure?'
   }
 ])
 .then((answers) => {
