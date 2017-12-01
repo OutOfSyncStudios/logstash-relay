@@ -56,7 +56,7 @@ The logstash-relay service has three possible modes of operation:
 ### [Stand-alone Service](#standalone)
 <a name="standalone"></a>
 
-The stand-alone option is available if you would like to host your own server architecture with which to run the relay. You will need to ensure that firewall rules for your server architecture are open to allow traffic from the appropriate ports.
+The stand-alone service option is available when it is desirable to use new/existing server architecture and more control over the environment is required.
 
 #### [Installation](#standalone-installation)
 <a name="standalone-installation"></a>
@@ -70,15 +70,17 @@ $ cd logstash-relay
 
 #### [Configuration](#standalone-configuration)
 <a name="standalone-configuration"></a>
-To setup your configuration, run:
+To configure, run:
 ```shell
 npm run config
 ```
-This will ask a series of questions which provides the base configuration. Alternatively, you can manually edit the `<logstash-relay-home>/config/config.js` file to make adjustments. The configuration file is an exported version of the [Configuration Object](#relay-configuration).
+This will ask a series of questions which provides the base configuration. Alternatively, it is possible to manually edit the `<logstash-relay-home>/config/config.js` file to make adjustments. The configuration file is an exported version of the [Configuration Object](#relay-configuration).
 
 ##### [Port Usage](#standalone-configuration-ports)
 <a name="standalone-configuration-ports"></a>
 By default, Logstash-Relay listens for HTTP request over port 8080 and HTTPS requests over port 8443 instead of ports 80 and 443 respectively. For security, on most Linux-based platforms the ports 80 and 443 are not available for services that do not run as the root user. To avoid any potential security issues or configuration hangups, it is recommended that Logstash-Relay is configured to use the default ports and that ports 80 and 443 are rerouted using `iptables` (or the system equivalent) to Logstash-Relay's default ports.
+
+Additionally, firewall rules should be opened to allow traffic to the appropriate ports.
 
 ***For Example:***
 
@@ -134,7 +136,7 @@ $ pm2 start main.js -n "Logstash-Relay" -i 1 -- -c <fullpath to config file>
 ### [Embedded Service](#embedded)
 <a name="embedded"></a>
 
-The embedded option is available if you would like to include the service bundled as a part of another service.
+The embedded option is available if  would like to include the service bundled as a part of another service.
 
 #### [Installation](#embedded-installation)
 <a name="embedded-installation"></a>
@@ -145,7 +147,7 @@ npm install logstash-relay
 
 #### [Usage](#embedded-usage)
 <a name="embedded-usage"></a>
-Within your library or application, add the following code:
+Within a library or application, add the following code:
 
 ```js
 const LogstashRelay = require('logstash-relay');
@@ -187,14 +189,14 @@ relay.close();
 
 ### [AWS Lambda Function](#awslambda)
 <a name="awslambda"></a>
-The service is also available to be run in a completely serverless environment by utilizing it as an AWS Lambda Function connected through CloudFormation and API Gateway.  To use this mode, you must have access to an AWS Account ID that has permissions to create and use CloudFormation, S3, API Gateway, CloudFront, and Lambda resources.
+The service is also available to be run in a completely serverless environment by utilizing it as an AWS Lambda Function connected through CloudFormation and API Gateway.  To use this mode, the AWS credentials must have permissions to create and use CloudFormation, S3, API Gateway, CloudFront, and Lambda resources.
 
 #### [Installation, Packaging, and Deployment](#awslambda-installation)
 <a name="awslambda-installation"></a>
 
-These steps support Linux and Mac only. When using Windows environment locally, it is recommended that a staging AWS EC2 instance with NVM(NodeJS) and Python is setup and used.
+These steps support MacOS and Linux. When using Windows environment locally, it is recommended that a staging AWS EC2 Linux instance with NVM(NodeJS) and Python is setup and used.
 
-  1. If it is not already, install the [AWS CLI](https://aws.amazon.com/cli/) to your staging environment (mac/linx only).
+  1. If it is not already, install the [AWS CLI](https://aws.amazon.com/cli/) on the staging environment (MacOS/Linux only).
   2. Clone the git repo:
   ```shell
   $ git clone https://github.com/MediaXPost/logstash-relay.git
@@ -213,9 +215,9 @@ These steps support Linux and Mac only. When using Windows environment locally, 
   $ npm run setup
   ```
 
-  This last step will create an S3 Bucket and a CloudFormation Stack. The CloudFormation Stack will in turn setup an AWS Lambda function and connect it to CloudFront and API GateWay. Additionally, routing through API Gateway and Route53 are possible to create a "pretty" URL that can connect to your API Gateway endpoint for the Lambda function. Please consult the [AWS API Gateway documentation](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for additional details.
+  This last step will create an S3 Bucket and a CloudFormation Stack. The CloudFormation Stack will in turn setup an AWS Lambda function and connect it to CloudFront and API GateWay. Additionally, routing through API Gateway and Route53 are possible to create a "pretty" URL that can connect to the API Gateway endpoint for the Lambda function. Please consult the [AWS API Gateway documentation](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for additional details.
 
-##### [Usage](#awslambda-usage)
+#### [Usage](#awslambda-usage)
 <a name="awslambda-usage"></a>
 
 The Lambda function can be called by making the appropriate [REST Endpoint](#restapi) request to the API Gateway `prod` endpoint. The correct `prod` Invoke URL can be retrieved throug the [API Gateway Dashboard](https://console.aws.amazon.com/apigateway/home) under APIs > (Your LogStashRelayAPI Name) > Stages.
@@ -248,11 +250,11 @@ The Lambda function can be called by making the appropriate [REST Endpoint](#res
 
 |parameter|type|description|
 |---------|----|-----------|
-|**`server.port`**|Integer|The server port to listen for HTTP requests|
+|**`server.port`**|Integer|The port to listen for HTTP requests|
 |**`server.shutdownTime`**|Integer|Time in millisecond to allow for graceful shutdown|
 |**`server.timeout`**|Integer|Time in seconds to wait to receive data from client before timeing out|
 |**`server.sslEnabled`**|Boolean|Enable handling of HTTPS requests (***stand-alone and embedded modes only***)|
-|**`server.sslPort`**|Integer|The server port to listen for HTTPS request when `sslEnabled === true`|
+|**`server.sslPort`**|Integer|The port to listen for HTTPS request when `sslEnabled === true`|
 |**`server.sslKey`**|String|The full path to the Certificate .key file for HTTPS request when `sslEnabled === true`|
 |**`server.sslCert`**|String|The full path to the Certificate .pem/.crt file for HTTPS request when `sslEnabled === true`|
 |**`logging`**|Object|Required but only used in stand-alone mode. These options only pertain to logging events generated by the service, not events which are being relayed through the endpoints.|
@@ -270,7 +272,7 @@ The Lambda function can be called by making the appropriate [REST Endpoint](#res
 
 ### [Logging Object](#relay-logging)
 <a name="relay-logging"></a>
-The Logging object is an instance of any logging library, such as [Winston](https://www.npmjs.com/package/winston) or [Bunyan](https://www.npmjs.com/package/bunyan), which support the `.error(...)`, `.info(...)`, `.debug(...)`, and `.log(...)` methods. When in stand-alone mode, the server will use the configuration values to create an instance of Winston.
+The Logging object is an instance of any logging library, such as [Winston](https://www.npmjs.com/package/winston) or [Bunyan](https://www.npmjs.com/package/bunyan), which support the `.error(...)`, `.info(...)`, `.debug(...)`, and `.log(...)` methods. When in stand-alone mode, the service will use the configuration values to create an instance of Winston.
 
 ## [Logstash](#logstash)
 <a name="logstash"></a>
@@ -285,10 +287,9 @@ This package contains two files -- `./config/logstash-relay.conf` and `./config/
 
 To setup Logstash with these files:
 
-    1. Copy the appropriate files to the Logstash server instance configuration folder. This is usually `/etc/logstash/conf.d` for most configurations.
-    2. Edit the file(s) and update the ElasticSearch server host address as appropriate for the environment.
-    3. Restart Logstash -- usually this is done with the command `$ initctl restart logstash`.
-
+  1. Copy the appropriate files to the Logstash server instance configuration folder. This is usually `/etc/logstash/conf.d` for most configurations.
+  2. Edit the file(s) and update the ElasticSearch server host address as appropriate for the environment.
+  3. Restart Logstash -- usually this is done with the command `$ initctl restart logstash`.
 
 ### [Event Data](#logstash-eventdata)
 <a name="logstash-eventdata"></a>
@@ -302,7 +303,7 @@ Event data is passed to Logstash as a JSON object formatted like below:
   actualIP: 'client_IP_address',
   ip: 'forwarded_client_IP_address_from_proxy',
   callID: 'UID for the relay request',
-  headers: 'An object containing all http headers sent to the server',
+  headers: 'An object containing all http headers sent to the service',
   clientTimestamp: timestamp
 }
 ```
@@ -321,7 +322,7 @@ Event data is passed to Logstash as a JSON object formatted like below:
 
 ## [REST API](#restapi)
 <a name="restapi"></a>
-Once the server is setup and running, then the REST API microservice will be available. The service provides two identical POST endpoints.
+Once the service is setup and running, then the REST API microservice will be available. The service provides two identical POST endpoints.
 
 ### [Endpoints](#restapi-endpoints)
 <a name="restapi-endpoints"></a>
@@ -361,9 +362,7 @@ JSNLogs events are structured as follows:
 ### [Calling](#restapi-calling)
 <a name="restapi-calling"></a>
 
-Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourserviceURL>/api/logger` or `http(s)://<yourserviceURL>/jsnlog.logger`.  Alternatively, call these endpoints directly in your client or server application using one of the log formats outlined above.
-
-
+Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourserviceURL>/api/logger` or `http(s)://<yourserviceURL>/jsnlog.logger`.  Alternatively, call these endpoints directly within an application using one of the log formats outlined above.
 
 # License
 <a name="license"></a>
