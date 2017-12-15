@@ -355,6 +355,10 @@ class Server {
     this.router = router();
     /* eslint new-cap: "error" */
 
+    if (isLambda === true) {
+      app.use(awsServerlessExpressMiddleware.eventContext());
+    }
+
     // Handle CORS
     app.use(this.handleCORS.bind(this));
     app.options('/*', (req, res) => {
@@ -366,10 +370,6 @@ class Server {
     // The 'bind' statements are there to preserve the scope of this class
     app.use(this.attachCallID.bind(this));
     // app.use(this.controllers.AuthController.authenticateRequest.bind(this.controllers.AuthController));
-
-    if (isLambda === true) {
-      app.use(awsServerlessExpressMiddleware.eventContext());
-    }
 
     // Start Metrics Gathering on Route processing
     app.use(this.startRouteTimer.bind(this));
