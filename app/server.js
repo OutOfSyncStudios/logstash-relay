@@ -358,15 +358,18 @@ class Server {
     this.router = router();
     /* eslint new-cap: "error" */
 
+    // Handle CORS Headers
+    app.use(this.handleCORS.bind(this));
+
+    // Add Lambda Context when in Lambda mode
     if (isLambda === true) {
       app.use(awsServerlessExpressMiddleware.eventContext());
     }
 
-    // Handle CORS
-    app.use(this.handleCORS.bind(this));
+    // Handle CORS Request
     app.options('/*', (req, res) => {
       res.status(200);
-      res.send('OK');
+      res.json({message: 'OK'});
     });
 
     // bind middleware to use for all requests
