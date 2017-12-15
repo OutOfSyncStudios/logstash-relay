@@ -17,6 +17,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const timeout = require('connect-timeout');
 const expressWinston = require('express-winston');
+const compression = require('compression');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
 /**
@@ -334,6 +335,8 @@ class Server {
 
   setupServer(app, isLambda) {
     this.log.debug('Starting server');
+
+    app.use(compression());
 
     app.use(this.setupTimers.bind(this));
 
