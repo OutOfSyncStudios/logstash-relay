@@ -71,7 +71,7 @@ class App {
   // ****************************************************************************
   // Application Initialization Logic
   // ***************************************************************************/
-  init() {
+  init(isLambda) {
     // Setup graceful exit for SIGTERM and SIGINT
     process.on('SIGTERM', this.handleSIGTERM.bind(this));
     process.on('SIGINT', this.handleSIGINT.bind(this));
@@ -79,7 +79,7 @@ class App {
     // Start Logging & Server
     this.log.debug(config);
     this.server = new Server(config, this.log);
-    this.server.init();
+    this.server.init(isLambda);
   }
 }
 
