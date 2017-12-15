@@ -422,6 +422,8 @@ class Server {
       meta: true
     }));
 
+    app.disable('x-powered-by');
+
     // the buck stops here -- all responses are sent, regardless of status
     app.use(this.sendResponse.bind(this));
 
