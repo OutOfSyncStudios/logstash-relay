@@ -322,8 +322,8 @@ class Server {
   // Server Initialization Logic
   // ***************************************************************************/
   init(isLambda) {
-    this.setupRelay(this.config, isLambda);
-    this.setupServer(this.app);
+    this.setupRelay(this.config);
+    this.setupServer(this.app, isLambda);
     this.isActive = true;
   }
 
