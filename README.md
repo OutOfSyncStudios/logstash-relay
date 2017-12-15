@@ -30,6 +30,7 @@ A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event 
           3. [AWS Lambda Function](#awslambda)
               1. [Installation, Packaging, and Deployment](#awslambda-installation)
               2. [Usage](#awslambda-usage)
+              3. [Local Testing](#awslambda-localtesting)
       2. [Configuration Object](#relay-configuration)
       3. [Logging Object](#relay-logging)
       4. [Logstash](#logstash)
@@ -224,6 +225,11 @@ These steps support MacOS and Linux. When using Windows environment locally, it 
 <a name="awslambda-usage"></a>
 
 The Lambda function can be called by making the appropriate [REST Endpoint](#restapi) request to the API Gateway `prod` endpoint. The correct `prod` Invoke URL can be retrieved throug the [API Gateway Dashboard](https://console.aws.amazon.com/apigateway/home) under APIs > (Your LogStashRelayAPI Name) > Stages.
+
+#### [Local Testing](#awslambda-localtesting)
+<a name="awslambda-localtesting"></a>
+
+To test as an AWS Lambda function, it is highly recommended to use the [AWS SAM CLI Tool](https://github.com/awslabs/aws-sam-local/releases) with [Docker](https://www.docker.com/community-edition#/download) from your local environment and ensure that the Invoke URL returns data as expected with your configuration before deployment to AWS.
 
 ## [Configuration Object](#relay-configuration)
 <a name="relay-configuration"></a>
