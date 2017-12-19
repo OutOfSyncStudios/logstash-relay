@@ -1,8 +1,8 @@
 {
   "name": "logstash-relay",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
-  "main": "lambda.js",
+  "main": "index.js",
   "config": {
     "s3BucketName": "YOUR_UNIQUE_BUCKET_NAME",
     "region": "YOUR_AWS_REGION",
@@ -72,6 +72,7 @@
     "body-parser": "^1.18.2",
     "commander": "^2.11.0",
     "connect-timeout": "^1.9.0",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "express-winston": "^2.4.0",
     "http": "0.0.0",

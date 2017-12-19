@@ -16,6 +16,7 @@ const router = express.Router;
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const timeout = require('connect-timeout');
+const cors = require('cors');
 const expressWinston = require('express-winston');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
@@ -144,8 +145,8 @@ class Server {
       res.locals.headers = {};
     }
     res.locals.headers['Access-Control-Allow-Origin'] = '*';
-    res.locals.headers['Access-Control-Allow-Methods'] = 'GET, POST, DELETE, PUT, OPTIONS';
-    res.locals.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, level, message';
+    res.locals.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
+    res.locals.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
     next();
   }
 
@@ -355,16 +356,14 @@ class Server {
     this.router = router();
     /* eslint new-cap: "error" */
 
+    // Handle CORS Headers
+    app.use(this.handleCORS.bind(this));
+    app.options('*', cors({ origin: true, method: ['POST', 'OPTIONS'] }));
+
+    // Add Lambda Context when in Lambda mode
     if (isLambda === true) {
       app.use(awsServerlessExpressMiddleware.eventContext());
     }
-
-    // Handle CORS
-    app.use(this.handleCORS.bind(this));
-    app.options('/*', (req, res) => {
-      res.status(200);
-      res.send('OK');
-    });
 
     // bind middleware to use for all requests
     // The 'bind' statements are there to preserve the scope of this class
@@ -376,7 +375,7 @@ class Server {
 
     // perform the logic for pushing the logging information
     app.use('/api/logger', this.handleIncomingLog.bind(this));
-    app.use('jsnlog.logger', this.handleIncomingLog.bind(this));
+    app.use('/jsnlog.logger', this.handleIncomingLog.bind(this));
 
     // Stop Metrics Gathering on Route processing
     app.use(this.stopRouteTimer.bind(this));
@@ -418,6 +417,8 @@ class Server {
       logstash: true,
       meta: true
     }));
+
+    app.disable('x-powered-by');
 
     // the buck stops here -- all responses are sent, regardless of status
     app.use(this.sendResponse.bind(this));
