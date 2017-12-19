@@ -16,8 +16,8 @@ const router = express.Router;
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const timeout = require('connect-timeout');
+const cors = require('cors');
 const expressWinston = require('express-winston');
-const compression = require('compression');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
 /**
@@ -145,8 +145,8 @@ class Server {
       res.locals.headers = {};
     }
     res.locals.headers['Access-Control-Allow-Origin'] = '*';
-    res.locals.headers['Access-Control-Allow-Methods'] = 'GET, POST, DELETE, PUT, OPTIONS';
-    res.locals.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, level, message';
+    res.locals.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
+    res.locals.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
     next();
   }
 
@@ -336,8 +336,6 @@ class Server {
   setupServer(app, isLambda) {
     this.log.debug('Starting server');
 
-    app.use(compression());
-
     app.use(this.setupTimers.bind(this));
 
     // Start Metrics Gathering on Response processing
@@ -360,17 +358,12 @@ class Server {
 
     // Handle CORS Headers
     app.use(this.handleCORS.bind(this));
+    app.options('*', cors({ origin: true, method: ['POST', 'OPTIONS'] }));
 
     // Add Lambda Context when in Lambda mode
     if (isLambda === true) {
       app.use(awsServerlessExpressMiddleware.eventContext());
     }
-
-    // Handle CORS Request
-    app.options('/*', (req, res) => {
-      res.status(200);
-      res.json({message: 'OK'});
-    });
 
     // bind middleware to use for all requests
     // The 'bind' statements are there to preserve the scope of this class
@@ -382,7 +375,7 @@ class Server {
 
     // perform the logic for pushing the logging information
     app.use('/api/logger', this.handleIncomingLog.bind(this));
-    app.use('jsnlog.logger', this.handleIncomingLog.bind(this));
+    app.use('/jsnlog.logger', this.handleIncomingLog.bind(this));
 
     // Stop Metrics Gathering on Route processing
     app.use(this.stopRouteTimer.bind(this));
