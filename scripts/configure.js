@@ -9,6 +9,7 @@ const inquirer = require('inquirer');
 const validate = require('./validate');
 const baseConfig = require('../config/default-config');
 const config = require('../config/config');
+const modifyFiles = require('./utils');
 
 let conf = __.merge(baseConfig, config);
 
@@ -208,6 +209,23 @@ function doConfig() {
   .then((answers) => {
     mapAnswers(answers);
     fs.writeFileSync(configFile, `module.exports = ${JSON.stringify(conf, null, 2)};`);
+    if (answers.mode === 'AWS Lambda Function') {
+      // Replace "main": "index.js" with "main": "lambda.js"
+      modifyFiles(['./package.json'],
+        [{
+          regexp: /"main": "index.js",/,
+          replacement: `"main": "lambda.js",`
+        }]
+      );
+    } else {
+      // replace "main": "lambda.js" with "main": "index.js"
+      modifyFiles(['./package.json'],
+        [{
+          regexp: /"main": "lambda.js",/,
+          replacement: `"main": "index.js",`
+        }]
+      );
+    }
   })
   .catch((err) => {
     console.error(err.stack || err);
