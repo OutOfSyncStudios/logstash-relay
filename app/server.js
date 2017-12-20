@@ -379,8 +379,8 @@ class Server {
     app.use(this.startRouteTimer.bind(this));
 
     // perform the logic for pushing the logging information
-    app.use('/api/logger', this.handleIncomingLog.bind(this));
-    app.use('/jsnlog.logger', this.handleIncomingLog.bind(this));
+    app.post('/api/logger', this.handleIncomingLog.bind(this));
+    app.post('/jsnlog.logger', this.handleIncomingLog.bind(this));
 
     // Stop Metrics Gathering on Route processing
     app.use(this.stopRouteTimer.bind(this));
