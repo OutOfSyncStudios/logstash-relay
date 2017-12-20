@@ -79,7 +79,7 @@ class Server {
   setError(err, req, res) {
     const errorBlock = { summary: 'General Server Error', message: 'An unknown error occurred processed the log message.' };
     if (__.hasValue(err)) {
-      errorBlock.details = err;
+      errorBlock.details = err.toString();
     }
     req.hasError = true;
     req.error = errorBlock;
