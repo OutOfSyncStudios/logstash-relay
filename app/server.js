@@ -19,6 +19,8 @@ const timeout = require('connect-timeout');
 const cors = require('cors');
 const expressWinston = require('express-winston');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
+const connectionTester = require('connection-tester');
+
 
 /**
  * @class Server
@@ -334,6 +336,12 @@ class Server {
   }
 
   setupRelay(config) {
+    this.log.debug(`Setting up logging relay '${config.logstash.relay.appName}' to ${config.logstash.relay.host}:${config.logstash.relay.port}.`)
+    let results = connectionTester.test(config.logstash.relay.host, 22, 1000);
+    if (results.err) {
+      this.log.error(results.err);
+    }
+    this.log.debug(`Connection Active? ${results.success}`);
     this.relayLogger = new RelayLogger(config);
     this.relayLog = this.relayLogger.log;
   }
