@@ -177,8 +177,12 @@ class Server {
   handleIncomingLog(req, res, next) {
     try {
       if (__.hasValue(req.body.r) && __.hasValue(req.body.lg)) {
+        let lg = req.body.lg;
         // Handle JSNLogs style logging
-        if (!req.body.lg || !Array.isArray(req.body.lg)) {
+        if (typeof req.body.lg === 'string') {
+          lg = this.safeDeserialize(req.body.lg);
+        }
+        if (!lg || !Array.isArray(lg)) {
           next('Malformed JSNLogs log message');
           return;
         }
@@ -188,7 +192,7 @@ class Server {
         for (let itr = 0; itr < count; itr++) {
           const entry = req.body.lg[itr];
           const logName = entry.n;
-          const level = entry.l.toLowerCase() || 'error';
+          const level = (__.hasValue(entry.l)?entry.l.toString().toLowerCase():'error');
           const timestamp = entry.t;
           const logMessage = {
             type: 'client_error',
