@@ -11,9 +11,10 @@ const config = require('./config/config');
   * @class App
   */
 class App {
-  constructor(logger) {
+  constructor(logger, isLambda) {
     this.logger = {};
     this.log = {};
+    config.isLambda = isLambda;
     this.setupLogging(logger);
   }
 
