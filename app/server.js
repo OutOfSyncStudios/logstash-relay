@@ -19,6 +19,8 @@ const timeout = require('connect-timeout');
 const cors = require('cors');
 const expressWinston = require('express-winston');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
+const connectionTester = require('connection-tester');
+
 
 /**
  * @class Server
@@ -77,7 +79,7 @@ class Server {
   setError(err, req, res) {
     const errorBlock = { summary: 'General Server Error', message: 'An unknown error occurred processed the log message.' };
     if (__.hasValue(err)) {
-      errorBlock.details = err;
+      errorBlock.details = err.toString();
     }
     req.hasError = true;
     req.error = errorBlock;
@@ -175,8 +177,12 @@ class Server {
   handleIncomingLog(req, res, next) {
     try {
       if (__.hasValue(req.body.r) && __.hasValue(req.body.lg)) {
+        let lg = req.body.lg;
         // Handle JSNLogs style logging
-        if (!req.body.lg || !Array.isArray(req.body.lg)) {
+        if (typeof req.body.lg === 'string') {
+          lg = this.safeDeserialize(req.body.lg);
+        }
+        if (!lg || !Array.isArray(lg)) {
           next('Malformed JSNLogs log message');
           return;
         }
@@ -186,7 +192,7 @@ class Server {
         for (let itr = 0; itr < count; itr++) {
           const entry = req.body.lg[itr];
           const logName = entry.n;
-          const level = entry.l.toLowerCase() || 'error';
+          const level = (__.hasValue(entry.l)?entry.l.toString().toLowerCase():'error');
           const timestamp = entry.t;
           const logMessage = {
             type: 'client_error',
@@ -334,6 +340,12 @@ class Server {
   }
 
   setupRelay(config) {
+    this.log.debug(`Setting up logging relay '${config.logstash.relay.appName}' to ${config.logstash.relay.host}:${config.logstash.relay.port}.`)
+    let results = connectionTester.test(config.logstash.relay.host, 22, 1000);
+    if (results.err) {
+      this.log.error(results.err);
+    }
+    this.log.debug(`Connection Active? ${results.success}`);
     this.relayLogger = new RelayLogger(config);
     this.relayLog = this.relayLogger.log;
   }
@@ -379,8 +391,8 @@ class Server {
     app.use(this.startRouteTimer.bind(this));
 
     // perform the logic for pushing the logging information
-    app.use('/api/logger', this.handleIncomingLog.bind(this));
-    app.use('/jsnlog.logger', this.handleIncomingLog.bind(this));
+    app.post('/api/logger', this.handleIncomingLog.bind(this));
+    app.post('/jsnlog.logger', this.handleIncomingLog.bind(this));
 
     // Stop Metrics Gathering on Route processing
     app.use(this.stopRouteTimer.bind(this));
