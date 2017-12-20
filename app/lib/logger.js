@@ -47,7 +47,7 @@ class Logger {
       }
 
       if (!fs.existsSync(config.logging.logDir)) {
-        //console.log('Creating log folder');
+        // console.log('Creating log folder');
         fs.mkdirSync(config.logging.logDir);
       }
     } else {
