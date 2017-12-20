@@ -21,8 +21,10 @@ const App = require('./app');
 //   'text/xml'
 // ];
 
-const app = new App();
-app.init(true);
+const isLambda = true;
+
+const app = new App(null, isLambda);
+app.init(isLambda);
 
 const server = awsServerlessExpress.createServer(app.server.app); // , null, binaryMimeTypes);
 

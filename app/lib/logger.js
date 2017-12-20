@@ -17,31 +17,48 @@ class Logger {
   constructor(config) {
     this.logDir = config.logging.logDir || './logs';
 
-    const transports = [
-      new winston.transports.File({
+    const transports = [];
+
+    // Create log folder if it does not already exist (and we aren't in a lambda function)
+    if (!config.isLambda) {
+      transports.push(new winston.transports.File({
         filename: `${this.logDir}/info.log`,
         name: 'info-log',
         level: 'info',
         formatter: this.formatter
-      }),
-      new winston.transports.File({
+      }));
+      transports.push(new winston.transports.File({
         filename: `${this.logDir}/error.log`,
         name: 'error-log',
         level: 'error',
         formatter: this.formatter
-      })
-    ];
+      }));
+
+      // Optimization -- Add console and debug logging if not in production
+      if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
+        transports.push(new winston.transports.File({
+          filename: `${this.logDir}/debug.log`,
+          name: 'debug-log',
+          level: 'debug',
+          formatter: this.formatter
+        }));
+
+        transports.push(new winston.transports.Console({ level: 'debug', formatter: this.formatter }));
+      }
+
+      if (!fs.existsSync(config.logging.logDir)) {
+        // console.log('Creating log folder');
+        fs.mkdirSync(config.logging.logDir);
+      }
+    } else {
+      // Lambda just add console logging
+      transports.push(new winston.transports.Console({ level: 'debug', formatter: this.formatter }));
+    }
 
     this.options = { exitOnError: false, transports: transports, json: true, logstash: true };
 
-    // Create log folder if it does not already exist
-    if (!fs.existsSync(config.logging.logDir)) {
-      console.log('Creating log folder');
-      fs.mkdirSync(config.logging.logDir);
-    }
-
     // Merge options from config into this object
-    this.option = __.assign(this.options, config.logging.options);
+    this.options = __.merge(this.options, config.logging.options);
     this.log = new winston.Logger(this.options);
 
     // Add logstash logging when configured for it
@@ -54,18 +71,6 @@ class Logger {
         logstash: true,
         level: 'info'
       });
-    }
-    
-    // Optimization -- Add console logging if not in production
-    if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
-      this.log
-        .add(winston.transports.Console, { level: 'debug', formatter: this.formatter })
-        .add(winston.transports.File, {
-          filename: `${this.logDir}/debug.log`,
-          name: 'debug-log',
-          level: 'debug',
-          formatter: this.formatter
-        });
     }
   }
 
