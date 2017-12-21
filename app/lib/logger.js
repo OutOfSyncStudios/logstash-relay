@@ -52,7 +52,7 @@ class Logger {
       }
     } else {
       // Lambda just add console logging
-      transports.push(new winston.transports.Console({ level: 'error', formatter: this.formatter }));
+      transports.push(new winston.transports.Console({ level: 'silly', formatter: this.formatter }));
     }
 
     this.options = { exitOnError: false, transports: transports, json: true, logstash: true };
