@@ -22,7 +22,7 @@ class RelayLogger {
       appName: config.logstash.relay.appName,
       json: true,
       logstash: true,
-      level: 'info'
+      level: 'silly'
     });
   }
 }
