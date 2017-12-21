@@ -188,9 +188,9 @@ class Server {
         }
 
         const requestID = req.body.r;
-        const count = req.body.lg.length;
+        const count = lg.length;
         for (let itr = 0; itr < count; itr++) {
-          const entry = req.body.lg[itr];
+          const entry = lg[itr];
           const logName = entry.n;
           const level = (__.hasValue(entry.l) ? entry.l.toString().toLowerCase() : 'error');
           const timestamp = entry.t;
