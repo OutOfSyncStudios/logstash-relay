@@ -192,7 +192,7 @@ class Server {
         for (let itr = 0; itr < count; itr++) {
           const entry = req.body.lg[itr];
           const logName = entry.n;
-          const level = (__.hasValue(entry.l)?entry.l.toString().toLowerCase():'error');
+          const level = (__.hasValue(entry.l) ? entry.l.toString().toLowerCase() : 'error');
           const timestamp = entry.t;
           const logMessage = {
             type: 'client_error',
@@ -340,8 +340,8 @@ class Server {
   }
 
   setupRelay(config) {
-    this.log.debug(`Setting up logging relay '${config.logstash.relay.appName}' to ${config.logstash.relay.host}:${config.logstash.relay.port}.`)
-    let results = connectionTester.test(config.logstash.relay.host, 22, 1000);
+    this.log.debug(`Setting up logging relay '${config.logstash.relay.appName}' to ${config.logstash.relay.host}:${config.logstash.relay.port}.`);
+    const results = connectionTester.test(config.logstash.relay.host, 22, 1000);
     if (results.err) {
       this.log.error(results.err);
     }
