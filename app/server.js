@@ -220,6 +220,7 @@ class Server {
           headers: req.headers,
           clientTimestamp: timestamp
         };
+        this.log.debug('Delivering log message to relay.');
         this.relayLog.log(level, JSON.stringify(logMessage));
       } else {
         next('Proper logging message was not found');
