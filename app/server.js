@@ -205,6 +205,8 @@ class Server {
             headers: req.headers,
             clientTimestamp: timestamp
           };
+          this.log.debug('Delivering JSNLogs log message to relay.');
+          this.log.debug(JSON.stringify(logMessage));
           this.relayLog.log(level, JSON.stringify(logMessage));
         }
       } else if (__.hasValue(req.body.level) && __.hasValue(req.body.message)) {
@@ -220,7 +222,8 @@ class Server {
           headers: req.headers,
           clientTimestamp: timestamp
         };
-        this.log.debug('Delivering log message to relay.');
+        this.log.debug('Delivering Log4JS log message to relay.');
+        this.log.debug(JSON.stringify(logMessage));
         this.relayLog.log(level, JSON.stringify(logMessage));
       } else {
         next('Proper logging message was not found');
