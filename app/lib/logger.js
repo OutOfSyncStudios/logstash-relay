@@ -5,6 +5,7 @@ const __ = require('./lodashExt');
 const fs = require('fs');
 const winston = require('winston');
 const LogstashUDP = require('winston-logstash-udp').LogstashUDP;
+const Logstash = require('winston-logstash').Logstash;
 
 /**
  * A utility class to wrap Winston logging
@@ -63,14 +64,19 @@ class Logger {
 
     // Add logstash logging when configured for it
     if (config.logging.logstashLogging === true) {
-      this.log.add(LogstashUDP, {
+      const logstashOptions = {
         port: config.logstash.logging.port,
         host: config.logstash.logging.host,
         appName: config.logstash.logging.appName,
         json: true,
         logstash: true,
-        level: 'info'
-      });
+        level: 'silly'
+      };
+      if (config.logstash.relay.mode === 'tcp') {
+        this.log.add(Logstash, logstashOptions);
+      } else {
+        this.log.add(LogstashUDP, logstashOptions);
+      }
     }
   }
 

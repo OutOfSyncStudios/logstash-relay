@@ -220,6 +220,7 @@ class Server {
           headers: req.headers,
           clientTimestamp: timestamp
         };
+        this.log.debug('Delivering log message to relay.');
         this.relayLog.log(level, JSON.stringify(logMessage));
       } else {
         next('Proper logging message was not found');
@@ -423,7 +424,7 @@ class Server {
           ' "ip": "{{req.headers[\'x-forwarded-for\']||req.connection.remoteAddress}}",' +
           ' "callID": "{{req.callID}}",' +
           ' "server": "{{req.oshost}}",' +
-          ' "headers": "{{JSON.stringify(req.headers)}}",' +
+          ' "headers": {{JSON.stringify(req.headers)}},' +
           ' "performance": {' +
           '    "response": {{req.timers.response}},' +
           '    "route": {{req.timers.route}},' +
