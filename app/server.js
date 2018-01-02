@@ -21,6 +21,16 @@ const expressWinston = require('express-winston');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 const connectionTester = require('connection-tester');
 
+const validLevels = ['silly','trace','debug','info','warn','error'];
+const numericLevels = {
+  [0]: 'trace',
+  [1]: 'trace',
+  [2]: 'debug',
+  [3]: 'info',
+  [4]: 'warn',
+  [5]: 'error',
+  [6]: 'error'
+};
 
 /**
  * @class Server
@@ -174,8 +184,27 @@ class Server {
     }
   }
 
+  normalizeLevel(errorLevel) {
+    let level = 'error';
+
+    if (__.hasValue(errorLevel)) {
+      if (Number.isInteger(errorLevel)) {
+        level = numericLevels[Math.floor(errorLevel / 1000)];
+      } else {
+        let test = errorLevel.toString().toLowerCase();
+        if (validLevels.includes(test)) {
+          level = test;
+        }
+      }
+    }
+
+    return level;
+  }
+
   handleIncomingLog(req, res, next) {
     try {
+      const timestamp = moment().valueOf();
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
       if (__.hasValue(req.body.r) && __.hasValue(req.body.lg)) {
         let lg = req.body.lg;
         // Handle JSNLogs style logging
@@ -192,18 +221,18 @@ class Server {
         for (let itr = 0; itr < count; itr++) {
           const entry = lg[itr];
           const logName = entry.n;
-          const level = (__.hasValue(entry.l) ? entry.l.toString().toLowerCase() : 'error');
-          const timestamp = entry.t;
+          const level = this.normalizeLevel(entry.l);
           const logMessage = {
             type: 'client_error',
             name: logName,
             requestID: requestID,
             client_error: this.safeDeserialize(entry.m),
             actualIP: req.connection.remoteAddress,
-            ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+            ip: ip,
             callID: req.callID,
             headers: req.headers,
-            clientTimestamp: timestamp
+            clientTimestamp: entry.t,
+            timestamp: timestamp
           };
           this.log.debug('Delivering JSNLogs log message to relay.');
           this.log.debug(JSON.stringify(logMessage));
@@ -211,16 +240,19 @@ class Server {
         }
       } else if (__.hasValue(req.body.level) && __.hasValue(req.body.message)) {
         // Handle Log4Javascript style logging
-        const level = req.body.level.toLowerCase() || 'error';
-        const timestamp = moment().valueOf();
+        const level = this.normalizeLevel(req.body.level);
         const logMessage = {
           type: 'client_error',
-          client_error: req.body.message,
+          level: level,
+          client_error: {
+            msg: req.body.message
+          },
           actualIP: req.connection.remoteAddress,
-          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+          ip: ip,
           callID: req.callID,
           headers: req.headers,
-          clientTimestamp: timestamp
+          clientTimestamp: timestamp,
+          timestamp: timestamp
         };
         this.log.debug('Delivering Log4JS log message to relay.');
         this.log.debug(JSON.stringify(logMessage));
