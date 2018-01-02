@@ -423,7 +423,7 @@ class Server {
           ' "ip": "{{req.headers[\'x-forwarded-for\']||req.connection.remoteAddress}}",' +
           ' "callID": "{{req.callID}}",' +
           ' "server": "{{req.oshost}}",' +
-          ' "headers": "{{JSON.stringify(req.headers)}}",' +
+          ' "headers": {{JSON.stringify(req.headers)}},' +
           ' "performance": {' +
           '    "response": {{req.timers.response}},' +
           '    "route": {{req.timers.route}},' +
