@@ -276,8 +276,9 @@ To test as an AWS Lambda function, it is highly recommended to use the [AWS SAM 
 |**`logstash.logging`**|Object|Logstash information for Logstash-Relay log events when `logging.logstashLogging === true`|
 |**`logstash.relay`**|Object|Logstash information for relayed log events|
 |**`logstash.*.host`**|String|IP/Domain of the logstash server for this configuration|
-|**`logstash.*.port`**|Integer|UDP Port that handled the events|
+|**`logstash.*.port`**|Integer|UDP/TCP Port that handled the events|
 |**`logstash.*.appName`**|String|Unique identifying name that Logstash uses to classify events sent to ElasticSearch|
+|**`logstash.*.mode`**|String|Mode to send logstash messages. Expect the value 'udp' or 'tcp'. If no value is provided, then UDP is used|
 
 ### [Logging Object](#relay-logging)
 <a name="relay-logging"></a>
@@ -288,11 +289,11 @@ The Logging object is an instance of any logging library, such as [Winston](http
 
 ### [Configuration](#logstash-configuration)
 <a name="logstash-configuration"></a>
-This package contains two files -- `./config/logstash-relay.conf` and `./config/logstash-logging.conf` -- that are necessary for proper configuration of the Logstash to listen for incoming events on the correct UDP ports.
+This package contains four files -- `./config/logstash-relay-tcp.conf`, `./config/logstash-relay-udp.conf`, `./config/logstash-logging-tcp.conf` and `./config/logstash-logging-udp.conf` -- that are necessary for proper configuration of the Logstash to listen for incoming events on the correct TCP/UDP ports. Only the associated one UDP or TCP file is needed depending on the configuration options.
 
-`logstash-logging.conf` is only used for the stand-alone mode and handles events created by Logstash-Relay itself when the option `logging.logstashLogging` is set to `true` in the service configuration.
+`logstash-logging-*.conf` is only used for the stand-alone mode and handles events created by Logstash-Relay itself when the option `logging.logstashLogging` is set to `true` in the service configuration.
 
-`logstash-relay.conf` handles all events that are passed to the relay and is necessary for proper functioning.
+`logstash-relay-*.conf` handles all events that are passed to the relay and is necessary for proper functioning.
 
 To setup Logstash with these files:
 

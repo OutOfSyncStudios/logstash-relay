@@ -15,7 +15,7 @@ module.exports = {
     logstashLogging: false
   },
   logstash: {
-    logging: { host: 'logstash-server', port: 5000, appName: 'logstash-relay' },
-    relay: { host: 'logstash-server', port: 5050, appName: 'client-errors' }
+    logging: { host: 'logstash-server', port: 5000, appName: 'logstash-relay', mode: 'udp' },
+    relay: { host: 'logstash-server', port: 5050, appName: 'client-errors', mode: 'udp' }
   }
 };
