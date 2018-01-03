@@ -21,7 +21,7 @@ const expressWinston = require('express-winston');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 const connectionTester = require('connection-tester');
 
-const validLevels = ['silly','trace','debug','info','warn','error'];
+const validLevels = ['silly', 'trace', 'debug', 'info', 'warn', 'error'];
 const numericLevels = {
   [0]: 'trace',
   [1]: 'trace',
@@ -191,7 +191,7 @@ class Server {
       if (Number.isInteger(errorLevel)) {
         level = numericLevels[Math.floor(errorLevel / 1000)];
       } else {
-        let test = errorLevel.toString().toLowerCase();
+        const test = errorLevel.toString().toLowerCase();
         if (validLevels.includes(test)) {
           level = test;
         }
@@ -244,9 +244,7 @@ class Server {
         const logMessage = {
           type: 'client_error',
           level: level,
-          client_error: {
-            msg: req.body.message
-          },
+          client_error: { msg: req.body.message },
           actualIP: req.connection.remoteAddress,
           ip: ip,
           callID: req.callID,
