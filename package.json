@@ -1,6 +1,6 @@
 {
   "name": "logstash-relay",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.",
   "main": "index.js",
   "config": {
