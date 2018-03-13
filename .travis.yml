@@ -19,3 +19,6 @@ env:
 before_install:
 - openssl aes-256-cbc -K $encrypted_41338b3e2ea3_key -iv $encrypted_41338b3e2ea3_iv
   -in ./config/ssl/localhost.key.enc -out ./config/ssl/localhost.key -d
+notifications:
+  slack:
+    secure: 2CRC0s7T4pcka8cl/3JTmkcDPlC5Yy+aiNRbWlDX6Hx+826xHy4cmMkJd0wJ7w0HQbBxdk2hCD+ZAGNOgyinq26l8j8so1IkYYqMwEpvWiNZLnaaAGPm/lz3SCUHbhdLGSa0Ahmn51Yt3d77mu4wvGLYDBySCbmu4pwgYbTPgV2vOlmsSjh77aWZZ/FunOLind+uGaad8yhmjDz2/mz11/xyqsm55loiJcNHG6aSaoY1I87b2C2ilJ5Qulm+1k2xk7t24hzMyt9+2KOfoVLiq+rUZXFDq546ErH1MKeoXQ2bn1Ou+C/QXt14mlUtyifJRQrk9b4g/1OHXvf1ENGUlcqC9AsBK7Q6M04zX0nlQ5wdXOmwFJVR2N2GuDv5Qcv8mJBCJSPHKtje7/DBrHMMJURwsy/BN4GL/AlWYMzsU09RcWh0yK6Kva2wR4SuUc9t++T/1X+aptUowwEG3gliDla8dzvSL/ovAi43SaTLzaZCFDPDU2Nw24riVkapNmETXacby8y2pfHsK7otjOwvoX7y2d3cUn+5cQGoA6B1q95USsB6GvvgaHLOU+CrppPlCi97VH+NoMOuGSUQ6UWSaboMFtjcuS55pphd7/c7aKQFHlj6Bspxsri+wMFbFOixd1sURn9FU3oJypDkOGAHNFj90tS8N/0aDBODUT0gn7Y=
