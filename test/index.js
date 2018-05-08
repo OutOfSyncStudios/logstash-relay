@@ -1,5 +1,7 @@
 const request = require('supertest');
-const test = require('unit.js');
+const chai = require('chai');
+const expect = chai.expect;
+
 const config = require('../config/config');
 
 describe('logstash-relay', () => {
@@ -12,13 +14,13 @@ describe('logstash-relay', () => {
     const MyModule = require('../');
     const myClass = new MyModule(config);
 
-    test.assert(myClass instanceof LogStashRelay);
+    expect(myClass).to.be.instanceof(LogStashRelay);
   });
 
   it('startup', async() => {
     await logRelay.init();
     svr = logRelay.server;
-    test.assert(logRelay.isActive);
+    expect(logRelay.isActive).to.be.equal(true);
   }).timeout(3000);
 
   it('Bad Endpoint GET', (done) => {
@@ -62,6 +64,6 @@ describe('logstash-relay', () => {
 
   it('shutdown', () => {
     logRelay.close();
-    test.assert(!logRelay.isActive);
+    expect(!logRelay.isActive).to.be.equal(true);
   });
 });
