@@ -27,6 +27,7 @@ const options = {
   account: null,
   lambda: null,
   bucket: null,
+  prefix: null,
   region: null
 };
 
@@ -37,6 +38,9 @@ function performModify() {
     [{
       regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
       replacement: `$1"${options.bucket}",`
+    }, {
+      regexp: /("s3Prefix": )"([A-Za-z0-9_-]*)",/,
+      replacement: `$1"${options.prefix}",`
     }, {
       regexp: /("region": )"([A-Za-z0-9_-]*)",/,
       replacement: `$1"${options.region}",`
@@ -79,6 +83,7 @@ function setupQuestions() {
       type: 'input',
       name: 'account',
       message: 'Supply a 12-digit AWS Account ID:',
+      default: getDefault(options.account, null),
       validate: (v) => {
         if ((/^\w{12}$/).test(v)) {
           return true;
@@ -96,7 +101,7 @@ function setupQuestions() {
       type: 'input',
       name: 'lambda',
       message: 'Enter the AWS function name:',
-      default: 'LogStashRelayFunction',
+      default: getDefault(options.lambda, 'Function'),
       validate: (v) => {
         if ((/^[a-zA-Z_$][a-zA-Z_\-$0-9]*$/).test(v)) {
           return true;
@@ -114,7 +119,7 @@ function setupQuestions() {
       type: 'input',
       name: 'bucket',
       message: 'Enter a unique AWS S3 Bucket name:',
-      default: 'LogStashRelayBucket',
+      default: getDefault(options.bucket, 'LogStashRelayBucket'),
       validate: (v) => {
         if ((/^[a-zA-Z_\-$0-9]*$/).test(v)) {
           return true;
@@ -127,11 +132,29 @@ function setupQuestions() {
     options.bucket = program.bucket;
   }
 
+  if (!program.prefix) {
+    questions.push({
+      type: 'input',
+      name: 'prefix',
+      message: 'Enter a unique AWS S3 Prefix name:',
+      default: getDefault(options.prefix, '/'),
+      validate: (v) => {
+        if ((/^[a-zA-Z_-0-9\/]*$/).test(v)) {
+          return true;
+        } else {
+          return 'Must be a valid bucket name. Only Alphanumercic, Underscore, Dash and Slash are allowed.'
+        }
+      }
+    });
+  } else {
+    options.prefix = program.prefix;
+  }
+
   if (!program.region || !availableRegions.includes(program.region)) {
     questions.push({
       type: 'list',
       name: 'region',
-      default: availableRegions,
+      default: getDefault(options.region, availableRegions),
       choices: availableRegions,
       message: 'Select an AWS Region:'
     });
@@ -144,10 +167,31 @@ function mapAnswers(answers) {
   if (answers.account) { options.account = answers.account; }
   if (answers.lambda) { options.lambda = answers.lambda; }
   if (answers.bucket) { options.bucket = answers.bucket; }
+  if (answers.prefix) { options.prefix = answers.prefix; }
   if (answers.region) { options.region = answers.region; }
 }
 
+function getDefault(value, def) {
+  if (value) {
+    if (value.toString().startsWith('YOUR')) {
+      return def;
+    }
+    return value;
+  }
+  return def;
+}
+
+function mapDefaults() {
+  const conf = pack.config;
+  if (conf.accountId) { options.account = conf.accountId; }
+  if (conf.functionName) { options.lambda = conf.functionName; }
+  if (conf.s3BucketName) { options.bucket = conf.s3BucketName; }
+  if (conf.s3Prefix) { options.prefix = conf.s3Prefix; }
+  if (conf.region) { options.region = conf.region; }
+}
+
 function doConfig() {
+  mapDefaults();
   setupQuestions();
   if (questions.length !== 0) {
     inquirer.prompt(questions)
@@ -169,7 +213,8 @@ program
   .option('-b, --bucket <bucketName>', 'The S3 Bucket Name to configure and use.')
   .option(
     '-l, --lambda <functionName>',
-    'The name of the Lambda function to configure and use. Defaults to "AwsServerlessExpressFunction"')
+    'The name of the Lambda function to configure and use. Defaults to "Function"')
+  .option('-p, --prefix <prefixName>', 'The S3 File Prefix (folder) to configure and use.')
   .option('-r, --region <awsRegion>', 'The AWS region to use. Defaults to "us-east-1"')
   .option('-f, --force', 'Do not ask for confirmation')
   .parse(process.argv);
