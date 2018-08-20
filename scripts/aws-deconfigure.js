@@ -9,6 +9,7 @@ const defaults = {
   account: 'YOUR_ACCOUNT_ID',
   lambda: 'YOUR_SERVERLESS_EXPRESS_LAMBDA_FUNCTION_NAME',
   bucket: 'YOUR_UNIQUE_BUCKET_NAME',
+  prefix: 'YOUR_S3_PREFIX',
   region: 'YOUR_AWS_REGION'
 }
 
@@ -26,6 +27,9 @@ inquirer.prompt([
       [{
         regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
         replacement: `$1"${defaults.bucket}",`
+      }, {
+        regexp: /("s3Prefix": )"([A-Za-z0-9_-]*)",/,
+        replacement: `$1"${defaults.prefix}",`
       }, {
         regexp: /("region": )"([A-Za-z0-9_-]*)",/,
         replacement: `$1"${defaults.region}",`
