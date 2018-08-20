@@ -58,7 +58,7 @@ inquirer.prompt([
       [{
         regexp: /(uri: arn:aws:apigateway:)([A-Za-z0-9_-]*)(:lambda:path\/2017-11-28\/functions\/arn:aws:lambda:)([A-Za-z0-9_-]*):([A-Za-z0-9_-]*)(:function:\${stageVariables.ServerlessExpressLambdaFunctionName}\/invocations)/g,
         replacement: `$1${defaults.region}$3${defaults.region}:${defaults.account}$6`
-      } ]
+      }]
     );
   } else {
     console.log('Operation aborted');
