@@ -139,7 +139,7 @@ function setupQuestions() {
       message: 'Enter a unique AWS S3 Prefix name:',
       default: getDefault(options.prefix, '/'),
       validate: (v) => {
-        if ((/^[a-zA-Z_-0-9\/]*$/).test(v)) {
+        if ((/^[a-zA-Z_\-0-9\/]*$/).test(v)) {
           return true;
         } else {
           return 'Must be a valid bucket name. Only Alphanumercic, Underscore, Dash and Slash are allowed.'
