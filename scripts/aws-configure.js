@@ -39,7 +39,7 @@ function performModify() {
       regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
       replacement: `$1"${options.bucket}",`
     }, {
-      regexp: /("s3Prefix": )"([A-Za-z0-9_-]*)",/,
+      regexp: /("s3Prefix": )"([a-zA-Z_\-0-9\/]*)",/,
       replacement: `$1"${options.prefix}",`
     }, {
       regexp: /("region": )"([A-Za-z0-9_-]*)",/,
