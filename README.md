@@ -3,12 +3,11 @@
 [![NPM](https://nodei.co/npm/logstash-relay.png?downloads=true)](https://nodei.co/npm/logstash-relay/)
 
 [![Actual version published on npm](http://img.shields.io/npm/v/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
-[![Travis build status](https://travis-ci.org/MediaXPost/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
+[![Travis build status](https://travis-ci.org/OutOfSyncStudios/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
 [![Total npm module downloads](http://img.shields.io/npm/dt/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
-[![Package Quality](http://npm.packagequality.com/shield/logstash-relay.svg)](http://packagequality.com/#?package=logstash-relay)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/chronosis/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MediaXPost/logstash-relay&amp;utm_campaign=Badge_Grade)
-[![Codacy Coverage Badge](https://api.codacy.com/project/badge/Coverage/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/chronosis/logstash-relay?utm_source=github.com&utm_medium=referral&utm_content=chronosis/logstash-relay&utm_campaign=Badge_Coverage)
-[![Dependencies badge](https://david-dm.org/MediaXPost/logstash-relay/status.svg)](https://david-dm.org/MediaXPost/logstash-relay?view=list)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/OutOfSyncStudios/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OutOfSyncStudios/logstash-relay&amp;utm_campaign=Badge_Grade)
+[![Codacy Coverage Badge](https://api.codacy.com/project/badge/Coverage/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/OutOfSyncStudios/logstash-relay?utm_source=github.com&utm_medium=referral&utm_content=OutOfSyncStudios/logstash-relay&utm_campaign=Badge_Coverage)
+[![Dependencies badge](https://david-dm.org/OutOfSyncStudios/logstash-relay/status.svg)](https://david-dm.org/OutOfSyncStudios/logstash-relay?view=list)
 
 A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.
 
@@ -65,7 +64,7 @@ The stand-alone service option is available when it is desirable to use new/exis
 To install, clone the git repository:
 
 ```shell
-$ git clone https://github.com/MediaXPost/logstash-relay.git
+$ git clone https://github.com/OutOfSyncStudios/logstash-relay.git
 $ cd logstash-relay
 ```
 
@@ -202,7 +201,7 @@ These steps support MacOS and Linux. When using Windows environment locally, it 
   1. If it is not already, install the [AWS CLI](https://aws.amazon.com/cli/) on the staging environment (MacOS/Linux only).
   2. Clone the git repo:
   ```shell
-  $ git clone https://github.com/MediaXPost/logstash-relay.git
+  $ git clone https://github.com/OutOfSyncStudios/logstash-relay.git
   $ cd logstash-relay
   ```
   3. Run the base configurator:
@@ -376,4 +375,5 @@ Setup JSNLogs or Log4JS to create AJAX requests that point to `http(s)://<yourse
 # [License](#license)
 <a name="license"></a>
 
-Copyright (c) 2017, 2018 Jay Reardon -- Licensed under the MIT license.
+Copyright (c) 2017, 2018, 2019 Jay Reardon
+Copyright (c) 2019 Out of Sync Studios LLC  -- Licensed under the MIT license.
