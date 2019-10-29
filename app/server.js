@@ -1,7 +1,7 @@
 // app/server.js
 
 // Dependencies
-const __ = require('@mediaxpost/lodashext');
+const __ = require('@outofsync/lodash-ex');
 const LogStub = require('logstub');
 const RelayLogger = require('./lib/relayLogger');
 const http = require('http');

@@ -6,6 +6,7 @@ const config = require('../config/config');
 
 describe('logstash-relay', () => {
   const LogStashRelay = require('../');
+  config.silent = true;
   const logRelay = new LogStashRelay(config);
 
   let svr;
@@ -57,7 +58,7 @@ describe('logstash-relay', () => {
 
   /* eslint id-length: off */
   it('Good Endpoint POST -- good JSNLogs data', (done) => {
-    request(svr).post('/api/logger')
+    request(svr).post('/jsnlog.logger')
       .send({ r: 'ABCDEFG', lg: [{ n: 'test', l: 'error', t: Date.now(), m: 'LAME' }] })
       .expect(200, done);
   });

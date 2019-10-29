@@ -1,9 +1,8 @@
-// app/lib/logger.js
+// app/lib/relayLogger.js
 
 // Dependencies
 const winston = require('winston');
-const Logstash = require('winston-logstash').Logstash;
-const LogstashUDP = require('winston-logstash-udp').LogstashUDP;
+const WinstonLogStash = require('winston3-logstash-transport');
 
 /**
  * A utility class to wrap Winston logging
@@ -15,9 +14,10 @@ const LogstashUDP = require('winston-logstash-udp').LogstashUDP;
 class RelayLogger {
   constructor(config) {
     this.options = { exitOnError: false, json: true, logstash: true };
-    this.log = new winston.Logger(this.options);
+    this.log = winston.createLogger(this.options);
 
     const options = {
+      mode: config.logstash.relay.mode,
       port: config.logstash.relay.port,
       host: config.logstash.relay.host,
       appName: config.logstash.relay.appName,
@@ -26,11 +26,7 @@ class RelayLogger {
       level: 'silly'
     };
 
-    if (config.logstash.relay.mode === 'tcp') {
-      this.log.add(Logstash, options);
-    } else {
-      this.log.add(LogstashUDP, options);
-    }
+    this.log.add(new WinstonLogStash(options));
   }
 }
 
