@@ -87,7 +87,10 @@ class Server {
   //  Middleware functions (Core)
   // ***************************************************************************/
   setError(err, req, res) {
-    const errorBlock = { summary: 'General Server Error', message: 'An unknown error occurred processed the log message.' };
+    const errorBlock = {
+      summary: 'General Server Error',
+      message: 'An unknown error occurred processed the log message.'
+    };
     if (__.hasValue(err)) {
       errorBlock.details = err.toString();
     }
@@ -226,7 +229,9 @@ class Server {
             type: 'client_error',
             name: logName,
             requestID: requestID,
+            /* eslint-disable camelcase */
             client_error: this.safeDeserialize(entry.m),
+            /* eslint-enable camelcase */
             actualIP: req.connection.remoteAddress,
             ip: ip,
             callID: req.callID,
@@ -244,7 +249,9 @@ class Server {
         const logMessage = {
           type: 'client_error',
           level: level,
+          /* eslint-disable camelcase */
           client_error: { msg: req.body.message },
+          /* eslint-enable camelcase */
           actualIP: req.connection.remoteAddress,
           ip: ip,
           callID: req.callID,
@@ -374,7 +381,9 @@ class Server {
   }
 
   setupRelay(config) {
-    this.log.debug(`Setting up logging relay '${config.logstash.relay.appName}' to ${config.logstash.relay.host}:${config.logstash.relay.port}.`);
+    const relay = config.logstash.relay;
+    this.log.debug(`Setting up logging relay '${relay.appName}' to ` +
+      `${relay.host}:${relay.port}.`);
     const results = connectionTester.test(config.logstash.relay.host, 22, 1000);
     if (results.err) {
       this.log.error(results.err);
@@ -481,7 +490,9 @@ class Server {
 
       // Start the HTTPS server
       if (this.sslEnabled) {
-        this.httpsServer = https.createServer({ key: this.sslKey, cert: this.sslCert }, app).listen(this.sslPort);
+        this.httpsServer = https
+          .createServer({ key: this.sslKey, cert: this.sslCert }, app)
+          .listen(this.sslPort);
         this.log.debug(`Listening for HTTPS on port ${this.sslPort}`);
       }
     }
