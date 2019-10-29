@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const __ = require('lodash');
+/* eslint-disable no-console */
 const program = require('commander');
 const inquirer = require('inquirer');
 const modifyFiles = require('./utils');
@@ -33,47 +33,66 @@ const options = {
 
 const questions = [];
 
+function getDefault(value, def) {
+  if (value) {
+    if (value.toString().startsWith('YOUR')) {
+      return def;
+    }
+    return value;
+  }
+  return def;
+}
+
 function performModify() {
-  modifyFiles(['./package.json'],
-    [{
-      regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
-      replacement: `$1"${options.bucket}",`
-    }, {
-      regexp: /("s3Prefix": )"([a-zA-Z_\-0-9\/]*)",/,
-      replacement: `$1"${options.prefix}",`
-    }, {
-      regexp: /("region": )"([A-Za-z0-9_-]*)",/,
-      replacement: `$1"${options.region}",`
-    }, {
-      regexp: /("functionName": )"([A-Za-z0-9_-]*)",/,
-      replacement: `$1"${options.lambda}",`
-    }, {
-      regexp: /("accountId": )"(\w*)",/,
-      replacement: `$1"${options.account}",`
-    }]
+  modifyFiles(
+    ['./package.json'],
+    [
+      {
+        regexp: /("s3BucketName": )"([A-Za-z0-9_-]*)",/,
+        replacement: `$1"${options.bucket}",`
+      }, {
+        regexp: /("s3Prefix": )"([a-zA-Z_\-0-9/]*)",/,
+        replacement: `$1"${options.prefix}",`
+      }, {
+        regexp: /("region": )"([A-Za-z0-9_-]*)",/,
+        replacement: `$1"${options.region}",`
+      }, {
+        regexp: /("functionName": )"([A-Za-z0-9_-]*)",/,
+        replacement: `$1"${options.lambda}",`
+      }, {
+        regexp: /("accountId": )"(\w*)",/,
+        replacement: `$1"${options.account}",`
+      }
+    ]
   );
 
-  modifyFiles(['./cloudformation.yaml'],
-    [{
-      regexp: /^(      Variables:\n        ServerlessExpressLambdaFunctionName: \!Ref )(\w*)$/m,
-      replacement: `$1${options.lambda}`
-    }, {
-      regexp: /^(      Action: lambda:InvokeFunction\n      FunctionName: !GetAtt )(.*)$/m,
-      replacement: `$1${options.lambda}.Arn`
-    }, {
-      regexp: /^(  \w*):\n(    Type: AWS::Serverless::Function)$/m,
-      replacement: `  ${options.lambda}:\n$2`
-    }, {
-      regexp: /^(        - "#\/functions\/")\n(        - !Ref )(\w*)$/m,
-      replacement: `$1\n$2${options.lambda}`
-    }]
+  modifyFiles(
+    ['./cloudformation.yaml'],
+    [
+      {
+        regexp: /^( {6}Variables:\n {8}ServerlessExpressLambdaFunctionName: !Ref )(\w*)$/m,
+        replacement: `$1${options.lambda}`
+      }, {
+        regexp: /^( {6}Action: lambda:InvokeFunction\n {6}FunctionName: !GetAtt )(.*)$/m,
+        replacement: `$1${options.lambda}.Arn`
+      }, {
+        regexp: /^( {2}\w*):\n( {4}Type: AWS::Serverless::Function)$/m,
+        replacement: `  ${options.lambda}:\n$2`
+      }, {
+        regexp: /^( {8}- "#\/functions\/")\n( {8}- !Ref )(\w*)$/m,
+        replacement: `$1\n$2${options.lambda}`
+      }
+    ]
   );
 
-  modifyFiles(['./simple-proxy-api.yaml'],
-    [{
-      regexp: /(uri: arn:aws:apigateway:)([A-Za-z0-9_-]*)(:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:)([A-Za-z0-9_-]*):([A-Za-z0-9_-]*)(:function:\${stageVariables.ServerlessExpressLambdaFunctionName}\/invocations)/g,
-      replacement: `$1${options.region}$3${options.region}:${options.account}$6`
-    } ]
+  modifyFiles(
+    ['./simple-proxy-api.yaml'],
+    [
+      {
+        regexp: /(uri: arn:aws:apigateway:)([A-Za-z0-9_-]*)(:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:)([A-Za-z0-9_-]*):([A-Za-z0-9_-]*)(:function:\${stageVariables.ServerlessExpressLambdaFunctionName}\/invocations)/g,
+        replacement: `$1${options.region}$3${options.region}:${options.account}$6`
+      }
+    ]
   );
 }
 
@@ -84,12 +103,11 @@ function setupQuestions() {
       name: 'account',
       message: 'Supply a 12-digit AWS Account ID:',
       default: getDefault(options.account, null),
-      validate: (v) => {
-        if ((/^\w{12}$/).test(v)) {
+      validate: (val) => {
+        if ((/^\w{12}$/).test(val)) {
           return true;
-        } else {
-          return 'Must be a valid 12 digit AWS account';
         }
+        return 'Must be a valid 12 digit AWS account';
       }
     });
   } else {
@@ -102,12 +120,11 @@ function setupQuestions() {
       name: 'lambda',
       message: 'Enter the AWS function name:',
       default: getDefault(options.lambda, 'Function'),
-      validate: (v) => {
-        if ((/^[a-zA-Z_$][a-zA-Z_\-$0-9]*$/).test(v)) {
+      validate: (val) => {
+        if ((/^[a-zA-Z_$][a-zA-Z_\-$0-9]*$/).test(val)) {
           return true;
-        } else {
-          return 'Must be a valid function name. Only Alphanumercic, Underscore, and Dash are allowed and must not start with a number or dash.'
         }
+        return 'Must be a valid function name. Only Alphanumercic, Underscore, and Dash are allowed and must not start with a number or dash.';
       }
     });
   } else {
@@ -120,12 +137,11 @@ function setupQuestions() {
       name: 'bucket',
       message: 'Enter a unique AWS S3 Bucket name:',
       default: getDefault(options.bucket, 'LogStashRelayBucket'),
-      validate: (v) => {
-        if ((/^[a-zA-Z_\-$0-9]*$/).test(v)) {
+      validate: (val) => {
+        if ((/^[a-zA-Z_\-$0-9]*$/).test(val)) {
           return true;
-        } else {
-          return 'Must be a valid bucket name. Only Alphanumercic, Underscore, and Dash are allowed.'
         }
+        return 'Must be a valid bucket name. Only Alphanumercic, Underscore, and Dash are allowed.';
       }
     });
   } else {
@@ -138,12 +154,11 @@ function setupQuestions() {
       name: 'prefix',
       message: 'Enter a unique AWS S3 Prefix name:',
       default: getDefault(options.prefix, '/'),
-      validate: (v) => {
-        if ((/^[a-zA-Z_\-0-9\/]*$/).test(v)) {
+      validate: (val) => {
+        if ((/^[a-zA-Z_\-0-9/]*$/).test(val)) {
           return true;
-        } else {
-          return 'Must be a valid bucket name. Only Alphanumercic, Underscore, Dash and Slash are allowed.'
         }
+        return 'Must be a valid bucket name. Only Alphanumercic, Underscore, Dash and Slash are allowed.';
       }
     });
   } else {
@@ -171,16 +186,6 @@ function mapAnswers(answers) {
   if (answers.region) { options.region = answers.region; }
 }
 
-function getDefault(value, def) {
-  if (value) {
-    if (value.toString().startsWith('YOUR')) {
-      return def;
-    }
-    return value;
-  }
-  return def;
-}
-
 function mapDefaults() {
   const conf = pack.config;
   if (conf.accountId) { options.account = conf.accountId; }
@@ -195,13 +200,13 @@ function doConfig() {
   setupQuestions();
   if (questions.length !== 0) {
     inquirer.prompt(questions)
-    .then((answers) => {
-      mapAnswers(answers);
-      performModify();
-    })
-    .catch((err) => {
-      console.error(err.stack || err);
-    });
+      .then((answers) => {
+        mapAnswers(answers);
+        performModify();
+      })
+      .catch((err) => {
+        console.error(err.stack || err);
+      });
   } else {
     performModify();
   }
@@ -209,11 +214,12 @@ function doConfig() {
 
 program
   .version(pack.version)
-  .option('-a, --account <accountID>','The AWS Account ID to use.')
+  .option('-a, --account <accountID>', 'The AWS Account ID to use.')
   .option('-b, --bucket <bucketName>', 'The S3 Bucket Name to configure and use.')
   .option(
     '-l, --lambda <functionName>',
-    'The name of the Lambda function to configure and use. Defaults to "Function"')
+    'The name of the Lambda function to configure and use. Defaults to "Function"'
+  )
   .option('-p, --prefix <prefixName>', 'The S3 File Prefix (folder) to configure and use.')
   .option('-r, --region <awsRegion>', 'The AWS region to use. Defaults to "us-east-1"')
   .option('-f, --force', 'Do not ask for confirmation')
@@ -230,14 +236,14 @@ if (program.force === true) {
       message: 'You are about to destroy the current aws configuration. Are you sure?'
     }
   ])
-  .then((answers) => {
-    if (answers.ok) {
-      doConfig();
-    } else {
-      console.log('Operation aborted');
-    }
-  })
-  .catch((err) => {
-    console.error(err.stack || err);
-  });
+    .then((answers) => {
+      if (answers.ok) {
+        doConfig();
+      } else {
+        console.log('Operation aborted');
+      }
+    })
+    .catch((err) => {
+      console.error(err.stack || err);
+    });
 }
