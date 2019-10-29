@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
 const configFile = './config/config.js';
-const baseConfigFile = './config/default-config.js';
 
 const __ = require('lodash');
-const fs = require('fs')
+const fs = require('fs');
 const inquirer = require('inquirer');
 const validate = require('./validate');
 const baseConfig = require('../config/default-config');
 const config = require('../config/config');
 const modifyFiles = require('./utils');
 
-let conf = __.merge(baseConfig, config);
+const conf = __.merge(baseConfig, config);
 
 const modes = [
   'Stand-alone Service',
@@ -143,7 +143,7 @@ function setupQuestions() {
     default: conf.logstash.logging.host,
     message: 'Enter the LogStash IP or Hostname for service events:',
     when: (answers) => {
-      return (answers.mode === modes[0] && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging);
     }
   }, {
     type: 'input',
@@ -152,7 +152,7 @@ function setupQuestions() {
     message: 'Enter the LogStash UDP port for service events:',
     validate: validateInt,
     when: (answers) => {
-      return (answers.mode === modes[0] && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging);
     }
   }, {
     type: 'input',
@@ -160,7 +160,7 @@ function setupQuestions() {
     default: conf.logstash.logging.appName,
     message: 'Enter the unqiue App Name to use for LogStash service events:',
     when: (answers) => {
-      return (answers.mode === modes[0] && answers.logstashLogging)
+      return (answers.mode === modes[0] && answers.logstashLogging);
     }
   }, {
     type: 'input',
@@ -206,30 +206,36 @@ function mapAnswers(answers) {
 function doConfig() {
   setupQuestions();
   inquirer.prompt(questions)
-  .then((answers) => {
-    mapAnswers(answers);
-    fs.writeFileSync(configFile, `module.exports = ${JSON.stringify(conf, null, 2)};`);
-    if (answers.mode === 'AWS Lambda Function') {
-      // Replace "main": "index.js" with "main": "lambda.js"
-      modifyFiles(['./package.json'],
-        [{
-          regexp: /"main": "index.js",/,
-          replacement: `"main": "lambda.js",`
-        }]
-      );
-    } else {
-      // replace "main": "lambda.js" with "main": "index.js"
-      modifyFiles(['./package.json'],
-        [{
-          regexp: /"main": "lambda.js",/,
-          replacement: `"main": "index.js",`
-        }]
-      );
-    }
-  })
-  .catch((err) => {
-    console.error(err.stack || err);
-  })
+    .then((answers) => {
+      mapAnswers(answers);
+      fs.writeFileSync(configFile, `module.exports = ${JSON.stringify(conf, null, 2)};`);
+      if (answers.mode === 'AWS Lambda Function') {
+        // Replace "main": "index.js" with "main": "lambda.js"
+        modifyFiles(
+          ['./package.json'],
+          [
+            {
+              regexp: /"main": "index.js",/,
+              replacement: '"main": "lambda.js",'
+            }
+          ]
+        );
+      } else {
+        // replace "main": "lambda.js" with "main": "index.js"
+        modifyFiles(
+          ['./package.json'],
+          [
+            {
+              regexp: /"main": "lambda.js",/,
+              replacement: '"main": "index.js",'
+            }
+          ]
+        );
+      }
+    })
+    .catch((err) => {
+      console.error(err.stack || err);
+    });
 }
 
 
@@ -241,13 +247,13 @@ inquirer.prompt([
     message: 'This option will overwrite your existing configuration. Are you sure?'
   }
 ])
-.then((answers) => {
-  if (answers.ok) {
-    doConfig();
-  } else {
-    console.log('Operation aborted');
-  }
-})
-.catch((err) => {
-  console.error(err.stack || err);
-});
+  .then((answers) => {
+    if (answers.ok) {
+      doConfig();
+    } else {
+      console.log('Operation aborted');
+    }
+  })
+  .catch((err) => {
+    console.error(err.stack || err);
+  });
