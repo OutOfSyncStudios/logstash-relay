@@ -29,6 +29,10 @@ A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event 
               1. [Installation, Packaging, and Deployment](#awslambda-installation)
               2. [Usage](#awslambda-usage)
               3. [Local Testing](#awslambda-localtesting)
+          4. [Docker Container](#docker)
+              1. [Installation](#docker-installation)
+              2. [Configuration](#docker-configuration)
+              3. [Running](#docker-running)              
       2. [Configuration Object](#relay-configuration)
       3. [Logging Object](#relay-logging)
       4. [Logstash](#logstash)
@@ -48,10 +52,11 @@ A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event 
 ## [Modes of Operation](#relay-modes)
 <a name="relay-modes"></a>
 
-The logstash-relay service has three possible modes of operation:
+The logstash-relay service has four possible modes of operation:
  * [Stand-alone Service](#standalone)
  * [Embedded Service](#embedded)
  * [AWS Lambda Function](#awslambda)
+ * [Docker Container](#docker)
 
 ### [Stand-alone Service](#standalone)
 <a name="standalone"></a>
@@ -228,6 +233,43 @@ The Lambda function can be called by making the appropriate [REST Endpoint](#res
 <a name="awslambda-localtesting"></a>
 
 To test as an AWS Lambda function, it is highly recommended to use the [AWS SAM CLI Tool](https://github.com/awslabs/aws-sam-local/releases) with [Docker](https://www.docker.com/community-edition#/download) from your local environment and ensure that the Invoke URL returns data as expected with your configuration before deployment to AWS.
+
+<a name="docker"></a>
+### [Docker Container](#docker)
+
+<a name="docker-installation"></a>
+#### [Installation](#docker-installation)
+
+To install, clone the git repository:
+
+```
+$ git clone https://github.com/OutofSyncStudios/logstash-relay.git
+$ cd logstash-relay
+```
+
+<a name="docker-configuration"></a>
+#### [Configuration](#docker-configuration)
+
+To configure, run:
+```shell
+npm run config
+```
+This will ask a series of questions which provides the base configuration. Alternatively, it is possible to manually edit the `<logstash-relay-base>/config/config.js` file to make adjustments. The configuration file is an exported version of the [Configuration Object](#relay-configuration).
+
+<a name="docker-running"></a>
+#### [Running](#docker-running)
+
+Before running, ensure that a compatible statsd service is configured to listen for events on the configured port and the any firewall rules are open between the service and the statsd service.
+
+##### Building the Docker Image
+```shell
+$ npm run docker-build
+```
+
+##### Running the Built Docker Image
+```shell
+$ npm run docker-run
+```
 
 ## [Configuration Object](#relay-configuration)
 <a name="relay-configuration"></a>
