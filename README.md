@@ -5,8 +5,8 @@
 [![Actual version published on npm](http://img.shields.io/npm/v/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
 [![Travis build status](https://travis-ci.org/OutOfSyncStudios/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
 [![Total npm module downloads](http://img.shields.io/npm/dt/logstash-relay.svg)](https://www.npmjs.org/package/logstash-relay)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/OutOfSyncStudios/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OutOfSyncStudios/logstash-relay&amp;utm_campaign=Badge_Grade)
-[![Codacy Coverage Badge](https://api.codacy.com/project/badge/Coverage/f0adb055adc04f98941b7832bdb286ed)](https://www.codacy.com/app/OutOfSyncStudios/logstash-relay?utm_source=github.com&utm_medium=referral&utm_content=OutOfSyncStudios/logstash-relay&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e413c65f9f17412d95b2f7a75c69998f)](https://www.codacy.com/manual/OutOfSyncStudios/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OutOfSyncStudios/logstash-relay&amp;utm_campaign=Badge_Grade)
+[![Codacy Coverage Badge](https://api.codacy.com/project/badge/Coverage/e413c65f9f17412d95b2f7a75c69998f)](https://www.codacy.com/manual/OutOfSyncStudios/logstash-relay?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OutOfSyncStudios/logstash-relay&amp;utm_campaign=Badge_Coverage)
 [![Dependencies badge](https://david-dm.org/OutOfSyncStudios/logstash-relay/status.svg)](https://david-dm.org/OutOfSyncStudios/logstash-relay?view=list)
 
 A simple NodeJS service to relay JSNLogs or Log4Javascript/Log4JS(client) event messages to Logstash.
