@@ -3,6 +3,7 @@
 // Dependencies
 const __ = require('@outofsync/lodash-ex');
 const fs = require('fs');
+const util = require('util');
 const winston = require('winston');
 const { format } = winston;
 const WinstonLogStash = require('winston3-logstash-transport');
@@ -137,10 +138,10 @@ class Logger {
     out['@message'] = message;
     out['@timestamp'] = new Date().toISOString();
     out['@fields'] = options;
-    let oustr;
+    let outstr;
     try {
-      outstr = JSON.strinify(out);
-    } catch {
+      outstr = JSON.stringify(out);
+    } catch (err) {
       outstr = util.inspect(out, { depth: null });
     }
     return outstr;

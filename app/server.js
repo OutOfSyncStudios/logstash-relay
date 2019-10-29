@@ -121,7 +121,7 @@ class Server {
     if (!res.headersSent) {
       res.set('Content-Type', 'application/json');
       for (const header in res.locals.headers) {
-        if (res.locals.headers.hasOwnProperty(header)) {
+        if (Object.prototype.hasOwnProperty.call(res.locals.headers, header)) {
           res.header(header, res.locals.headers[header]);
         }
       }
