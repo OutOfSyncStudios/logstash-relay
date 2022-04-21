@@ -23,7 +23,8 @@ class RelayLogger {
       appName: config.logstash.relay.appName,
       json: true,
       logstash: true,
-      level: 'silly'
+      level: 'silly',
+      sslEnable: config.logstash.relay.ssl ? config.logstash.relay.ssl : false
     };
 
     this.log.add(new WinstonLogStash(options));
